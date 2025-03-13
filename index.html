@@ -233,6 +233,21 @@
                 gap: 10px;
             }
         }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid var(--primary-color);
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -1046,9 +1061,6 @@
             
             // Call the AI API to evaluate the response
             callAiApi(aiRequest);
-            
-            // Return a placeholder result while waiting for the API
-            return null;
         }
         
         function getReferenceVitals(patientData) {
@@ -1071,50 +1083,6 @@
             }
             
             return refVitals;
-        }
-        
-        function callAiApi(requestData) {
-            // Format the data for the AI assessment
-            const formattedRequest = formatAiRequest(requestData);
-            
-            // Here's how we would call the actual API in production
-        // (For now using a simulation for demo purposes)
-        /*
-        const payload = formatAiRequest(requestData);
-        
-        fetch("https://api.ppq.ai/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer sk-7sulP0Nq2oGR8PoB9lXAsg"  // This should be secured in production
-            },
-            body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Parse AI response
-            const aiResponse = data.choices[0].message.content;
-            const isCorrect = aiResponse.toLowerCase().startsWith('correct');
-            const explanation = aiResponse.substring(aiResponse.indexOf(' ') + 1);
-            
-            const result = {
-                correct: isCorrect,
-                message: explanation
-            };
-            
-            handleAnswerResult(result);
-        })
-        .catch(error => {
-            console.error("API error:", error);
-            // Fall back to simple validation if API fails
-            simulateAiResponse(requestData);
-        });
-        */
-        
-        // Simulation for demo purposes
-        setTimeout(() => {
-            simulateAiResponse(requestData);
-        }, 1500);
         }
         
         function formatAiRequest(requestData) {
@@ -1180,15 +1148,69 @@ If the learner identified some but not all abnormalities, use "PARTIALLY CORRECT
 If the learner identified none of the abnormalities or found problems where there are none, use "INCORRECT:".
 Always include the specific vital sign values that are abnormal.`;
             
-            // Prepare the payload for the API
+            return prompt;
+        }
+        
+        function callAiApi(requestData) {
+            // Format the data for the AI assessment
+            const formattedRequest = formatAiRequest(requestData);
+            
+            // Display loading state
+            feedbackDisplay.innerHTML = '<div style="text-align: center; padding: 10px;">Checking with AI...<div class="loader"></div></div>';
+            
+            // API configuration
+            const apiKey = "sk-7sulP0Nq2oGR8PoB9lXAsg";
+            const url = "https://api.ppq.ai/chat/completions";
+            
+            // Create payload with proper structure
             const payload = {
                 model: "gpt-4o",
-                messages: [
-                    { role: "user", content: prompt }
-                ]
+                messages: [{ role: "user", content: formattedRequest }]
             };
             
-            return payload;
+            // Make the actual API call
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${apiKey}`
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`API responded with status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Parse AI response - the content will be in choices[0].message.content
+                const aiResponse = data.choices[0].message.content;
+                
+                // Check if the response starts with CORRECT, PARTIALLY CORRECT, or INCORRECT
+                let isCorrect = false;
+                const upperResponse = aiResponse.toUpperCase();
+                if (upperResponse.startsWith('CORRECT:')) {
+                    isCorrect = true;
+                } else if (upperResponse.startsWith('PARTIALLY CORRECT:')) {
+                    isCorrect = true; // Count partial as correct but explanation will differ
+                }
+                
+                const result = {
+                    correct: isCorrect,
+                    message: aiResponse
+                };
+                
+                handleAnswerResult(result);
+            })
+            .catch(error => {
+                console.error("API error:", error);
+                // Show error message to user
+                feedbackDisplay.innerHTML = 'Error connecting to AI service. Falling back to simple validation.';
+                
+                // Fall back to simulation if API fails
+                simulateAiResponse(requestData);
+            });
         }
         
         function simulateAiResponse(requestData) {
@@ -1267,7 +1289,6 @@ Always include the specific vital sign values that are abnormal.`;
                 }
             }
             
-            // In production, we would parse the AI response here
             const result = {
                 correct: isCorrect,
                 message: explanation

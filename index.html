@@ -645,15 +645,17 @@
         });
         
         // Global keypress listener for advancing to next question
-        document.addEventListener('keypress', (e) => {
+        document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && waitingForNextQuestion) {
+                e.preventDefault();
                 startGame();
                 waitingForNextQuestion = false;
             }
         });
 
-        // Initialize timer value display
+        // Initialize timer value display and score display
         updateTimerValue();
+        updateScoreDisplay();
 
         // Functions
         function updateTimerValue() {
@@ -1019,13 +1021,16 @@
         function updateAverageTime() {
             if (questionCount > 0) {
                 const avgTime = (totalAnswerTime / questionCount).toFixed(1);
-                document.getElementById('avg-time').textContent = avgTime;
+                const avgTimeElement = document.getElementById('avg-time');
+                if (avgTimeElement) {
+                    avgTimeElement.textContent = avgTime;
+                }
             }
         }
 
         function checkAnswer(userAnswer) {
             // Show loading state
-            feedbackDisplay.textContent = 'Checking with AI...';
+            feedbackDisplay.innerHTML = '<div style="text-align: center; padding: 10px;">Checking with AI...<div class="loader"></div></div>';
             
             // Get reference vitals for this patient's age
             const refVitals = getReferenceVitals(currentPatientData);
@@ -1117,16 +1122,17 @@
             const ref = requestData.reference;
             
             let prompt = `
-            PEDIATRIC CLINICAL SCENARIO ASSESSMENT
-            
-            PATIENT DATA:
-            Age: ${patient.ageDisplay}
-            Weight: ${patient.weight} kg
-            `;
+You are evaluating a pediatric clinical scenario. The vital signs are presented followed by a learner's assessment.
+Determine if the assessment is correct based on the vital signs and age-appropriate normal ranges provided.
+
+PATIENT DATA:
+- Age: ${patient.ageDisplay}
+- Weight: ${patient.weight} kg
+`;
             
             // Add vital signs that are present
             if (patient.heartRate !== undefined) {
-                prompt += `Heart Rate: ${patient.heartRate} bpm (Normal range: ${ref.heartRateRange[0]}-${ref.heartRateRange[1]} bpm)\n`;
+                prompt += `- Heart Rate: ${patient.heartRate} bpm (Normal range: ${ref.heartRateRange[0]}-${ref.heartRateRange[1]} bpm)\n`;
             }
             
             if (patient.systolic !== undefined && patient.diastolic !== undefined) {
@@ -1141,39 +1147,43 @@
                     diaRange = `${bpRef.diastolic[0]}-${bpRef.diastolic[1]}`;
                 }
                 
-                prompt += `Blood Pressure: ${patient.systolic}/${patient.diastolic} mmHg (Normal range: ${sysRange}/${diaRange} mmHg)\n`;
+                prompt += `- Blood Pressure: ${patient.systolic}/${patient.diastolic} mmHg (Normal range: ${sysRange}/${diaRange} mmHg)\n`;
             }
             
             if (patient.temperature !== undefined) {
-                prompt += `Temperature: ${patient.temperature}°C (Normal range: 36.5-37.5°C)\n`;
+                prompt += `- Temperature: ${patient.temperature}°C (Normal range: 36.5-37.5°C)\n`;
             }
             
             if (patient.respiratoryRate !== undefined) {
-                prompt += `Respiratory Rate: ${patient.respiratoryRate}/min (Normal range: ${ref.respiratoryRateRange[0]}-${ref.respiratoryRateRange[1]}/min)\n`;
+                prompt += `- Respiratory Rate: ${patient.respiratoryRate}/min (Normal range: ${ref.respiratoryRateRange[0]}-${ref.respiratoryRateRange[1]}/min)\n`;
             }
             
             if (patient.urineOutput !== undefined) {
                 const expectedOutput = patient.weight * 1 * 24; // Minimal normal (1 mL/kg/hr)
                 const maxOutput = patient.weight * 4 * 24; // Maximum normal (4 mL/kg/hr)
-                prompt += `Urine Output: ${patient.urineOutput} mL/24hr (Normal range: ${Math.round(expectedOutput)}-${Math.round(maxOutput)} mL/24hr)\n`;
+                prompt += `- Urine Output: ${patient.urineOutput} mL/24hr (Normal range: ${Math.round(expectedOutput)}-${Math.round(maxOutput)} mL/24hr)\n`;
             }
             
-            prompt += `\nUSER'S ASSESSMENT: "${requestData.userResponse}"\n`;
+            // Add abnormalities detected by the system
+            if (requestData.abnormalities && requestData.abnormalities.length > 0) {
+                prompt += `\nABNORMALITIES DETECTED BY SYSTEM: ${requestData.abnormalities.join(', ')}\n`;
+            } else {
+                prompt += `\nABNORMALITIES DETECTED BY SYSTEM: None (all vital signs within normal ranges)\n`;
+            }
+            
+            prompt += `\nLEARNER'S ASSESSMENT: "${requestData.userResponse}"\n\n`;
+            
+            prompt += `Evaluate if the learner's assessment is correct. Start your response with either "CORRECT:" or "INCORRECT:" followed by a brief explanation.
+If the learner identified all abnormalities or correctly noted normal vitals, use "CORRECT:". 
+If the learner identified some but not all abnormalities, use "PARTIALLY CORRECT:".
+If the learner identified none of the abnormalities or found problems where there are none, use "INCORRECT:".
+Always include the specific vital sign values that are abnormal.`;
             
             // Prepare the payload for the API
             const payload = {
                 model: "gpt-4o",
                 messages: [
-                    { 
-                        role: "system", 
-                        content: "You are evaluating a medical student's response to pediatric clinical scenarios. " +
-                                "Your job is to determine if their interpretation is correct based on the vital signs provided. " +
-                                "Respond with ONLY 'CORRECT' or 'INCORRECT' followed by a very brief explanation (1-2 sentences)."
-                    },
-                    { 
-                        role: "user", 
-                        content: prompt
-                    }
+                    { role: "user", content: prompt }
                 ]
             };
             
@@ -1352,7 +1362,8 @@
         }
 
         function updateScoreDisplay() {
-            scoreDisplay.textContent = `Score: ${score}`;
+                            scoreDisplay.innerHTML = `Score: ${score} | Avg Time: <span id="avg-time">0.0</span>s`;
+                document.getElementById('avg-time').textContent = '0.0';
         }
 
         function flashScreen() {

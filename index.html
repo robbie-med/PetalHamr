@@ -175,26 +175,41 @@
             text-align: center;
         }
 
-        .loading {
-            position: relative;
+        .reference-toggle {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            text-decoration: underline;
         }
 
-        .loading::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 20px;
-            height: 20px;
-            margin: -10px 0 0 -10px;
-            border: 3px solid rgba(0, 0, 0, 0.1);
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 0.8s infinite linear;
+        .reference-table {
+            display: none;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .reference-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .reference-table th, .reference-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .reference-table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .reference-table tr:nth-child(even) {
+            background-color: #f2f2f2;
         }
         
         /* For smaller screens */
@@ -239,7 +254,7 @@
                 Click "Start Game" to begin...
             </div>
             
-            <input type="text" id="answer-input" placeholder="Type your answer here..." disabled>
+            <input type="text" id="answer-input" placeholder="Type your answer here (e.g., 'fever, tachycardia')..." disabled>
             
             <div class="feedback" id="feedback"></div>
         </div>
@@ -265,6 +280,123 @@
                 <div id="timeout-count">0</div>
             </div>
         </div>
+        
+        <div class="reference-toggle" id="reference-toggle">Show Reference Values</div>
+        <div class="reference-table" id="reference-table">
+            <table>
+                <tr>
+                    <th>Age Group</th>
+                    <th>Age</th>
+                    <th>Weight (kg)</th>
+                    <th>Heart Rate (bpm)</th>
+                    <th>Respiratory Rate</th>
+                    <th>BP (Systolic/Diastolic)</th>
+                </tr>
+                <tr>
+                    <td rowspan="1">Infant</td>
+                    <td>1-12 months</td>
+                    <td>4-10</td>
+                    <td>100-170</td>
+                    <td>30-60</td>
+                    <td>72-104/37-56</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">Toddler</td>
+                    <td>1 year</td>
+                    <td>10-14</td>
+                    <td>80-150</td>
+                    <td>24-40</td>
+                    <td>85-102/41-58</td>
+                </tr>
+                <tr>
+                    <td>2 years</td>
+                    <td>10-14</td>
+                    <td>80-150</td>
+                    <td>24-40</td>
+                    <td>89-106/44-62</td>
+                </tr>
+                <tr>
+                    <td rowspan="3">Preschooler</td>
+                    <td>3 years</td>
+                    <td>14-18</td>
+                    <td>70-130</td>
+                    <td>20-34</td>
+                    <td>90-107/47-65</td>
+                </tr>
+                <tr>
+                    <td>4 years</td>
+                    <td>14-18</td>
+                    <td>70-130</td>
+                    <td>20-34</td>
+                    <td>92-108/50-67</td>
+                </tr>
+                <tr>
+                    <td>5 years</td>
+                    <td>14-18</td>
+                    <td>70-130</td>
+                    <td>20-34</td>
+                    <td>93-110/53-70</td>
+                </tr>
+                <tr>
+                    <td rowspan="7">School-age</td>
+                    <td>6 years</td>
+                    <td>20-42</td>
+                    <td>65-120</td>
+                    <td>15-30</td>
+                    <td>90-109/59-73</td>
+                </tr>
+                <tr>
+                    <td>7 years</td>
+                    <td>20-42</td>
+                    <td>65-120</td>
+                    <td>15-30</td>
+                    <td>91-111/60-74</td>
+                </tr>
+                <tr>
+                    <td>8 years</td>
+                    <td>20-42</td>
+                    <td>65-120</td>
+                    <td>15-30</td>
+                    <td>93-113/60-75</td>
+                </tr>
+                <tr>
+                    <td>9 years</td>
+                    <td>20-42</td>
+                    <td>65-120</td>
+                    <td>15-30</td>
+                    <td>94-115/61-76</td>
+                </tr>
+                <tr>
+                    <td>10 years</td>
+                    <td>20-42</td>
+                    <td>65-120</td>
+                    <td>15-30</td>
+                    <td>96-117/62-77</td>
+                </tr>
+                <tr>
+                    <td>11 years</td>
+                    <td>20-42</td>
+                    <td>65-120</td>
+                    <td>15-30</td>
+                    <td>98-119/62-78</td>
+                </tr>
+                <tr>
+                    <td>12 years</td>
+                    <td>20-42</td>
+                    <td>65-120</td>
+                    <td>15-30</td>
+                    <td>100-121/63-78</td>
+                </tr>
+                <tr>
+                    <td>Adolescent</td>
+                    <td>>13 years</td>
+                    <td>50+</td>
+                    <td>55-90</td>
+                    <td>12-20</td>
+                    <td>102-124/64-80</td>
+                </tr>
+            </table>
+        </div>
     </div>
 
     <script>
@@ -282,50 +414,219 @@
         const correctCountDisplay = document.getElementById('correct-count');
         const incorrectCountDisplay = document.getElementById('incorrect-count');
         const timeoutCountDisplay = document.getElementById('timeout-count');
+        const referenceToggle = document.getElementById('reference-toggle');
+        const referenceTable = document.getElementById('reference-table');
+
+        // Toggle reference table
+        referenceToggle.addEventListener('click', () => {
+            if (referenceTable.style.display === 'block') {
+                referenceTable.style.display = 'none';
+                referenceToggle.textContent = 'Show Reference Values';
+            } else {
+                referenceTable.style.display = 'block';
+                referenceToggle.textContent = 'Hide Reference Values';
+            }
+        });
 
         // Game State
         let gameActive = false;
         let timeRemaining = 5;
         let timerInterval;
         let currentScenario = '';
+        let currentAbnormalities = [];
+        let currentPatientData = {};
         let score = 0;
         let correctCount = 0;
         let incorrectCount = 0;
         let timeoutCount = 0;
 
-        // Constants for vital signs ranges
-        const VITAL_SIGNS = {
-            weight: {
-                min: 3,
-                max: 50,
-                unit: 'kg'
+        // Reference data for pediatric vital signs
+        const PEDIATRIC_REFERENCE = {
+            INFANT: {
+                ageRange: "1-12 months",
+                ageDisplay: function() { return `${getRandomNumber(1, 12)} months`; },
+                weightRange: [4, 10],
+                heartRateRange: [100, 170],
+                respiratoryRateRange: [30, 60],
+                bpRange: {
+                    systolic: [72, 104],
+                    diastolic: [37, 56]
+                }
             },
-            heartRate: {
-                min: 60,
-                max: 200,
-                unit: 'bpm'
+            TODDLER: {
+                ageRange: "1-2 years",
+                ageOptions: [1, 2],
+                weightRange: [10, 14],
+                heartRateRange: [80, 150],
+                respiratoryRateRange: [24, 40],
+                bpRange: {
+                    1: { systolic: [85, 102], diastolic: [41, 58] },
+                    2: { systolic: [89, 106], diastolic: [44, 62] }
+                }
             },
-            bloodPressure: {
-                systolicMin: 70,
-                systolicMax: 140,
-                diastolicMin: 40,
-                diastolicMax: 90,
-                unit: ''
+            PRESCHOOLER: {
+                ageRange: "3-5 years",
+                ageOptions: [3, 4, 5],
+                weightRange: [14, 18],
+                heartRateRange: [70, 130],
+                respiratoryRateRange: [20, 34],
+                bpRange: {
+                    3: { systolic: [90, 107], diastolic: [47, 65] },
+                    4: { systolic: [92, 108], diastolic: [50, 67] },
+                    5: { systolic: [93, 110], diastolic: [53, 70] }
+                }
             },
-            temperature: {
-                min: 35.0,
-                max: 40.0,
-                unit: '°C'
+            SCHOOL_AGE: {
+                ageRange: "6-12 years",
+                ageOptions: [6, 7, 8, 9, 10, 11, 12],
+                weightRange: [20, 42],
+                heartRateRange: [65, 120],
+                respiratoryRateRange: [15, 30],
+                bpRange: {
+                    6: { systolic: [90, 109], diastolic: [59, 73] },
+                    7: { systolic: [91, 111], diastolic: [60, 74] },
+                    8: { systolic: [93, 113], diastolic: [60, 75] },
+                    9: { systolic: [94, 115], diastolic: [61, 76] },
+                    10: { systolic: [96, 117], diastolic: [62, 77] },
+                    11: { systolic: [98, 119], diastolic: [62, 78] },
+                    12: { systolic: [100, 121], diastolic: [63, 78] }
+                }
             },
-            respiratoryRate: {
-                min: 12,
-                max: 60,
-                unit: '/min'
+            ADOLESCENT: {
+                ageRange: ">13 years",
+                ageDisplay: function() { return `${getRandomNumber(13, 17)} years`; },
+                weightRange: [50, 80],
+                heartRateRange: [55, 90],
+                respiratoryRateRange: [12, 20],
+                bpRange: {
+                    systolic: [102, 124],
+                    diastolic: [64, 80]
+                }
+            }
+        };
+
+        // Clinical condition definitions
+        const CLINICAL_CONDITIONS = {
+            "tachycardia": {
+                check: (data) => {
+                    const ageGroup = data.ageGroup;
+                    return data.heartRate > PEDIATRIC_REFERENCE[ageGroup].heartRateRange[1];
+                },
+                terms: ["tachycardia", "tachy", "increased hr", "high hr", "elevated hr"]
             },
-            urineOutput: {
-                min: 100,
-                max: 2000,
-                unit: 'mL/24hr'
+            "bradycardia": {
+                check: (data) => {
+                    const ageGroup = data.ageGroup;
+                    return data.heartRate < PEDIATRIC_REFERENCE[ageGroup].heartRateRange[0];
+                },
+                terms: ["bradycardia", "brady", "decreased hr", "low hr"]
+            },
+            "tachypnea": {
+                check: (data) => {
+                    const ageGroup = data.ageGroup;
+                    return data.respiratoryRate > PEDIATRIC_REFERENCE[ageGroup].respiratoryRateRange[1];
+                },
+                terms: ["tachypnea", "increased rr", "high rr", "elevated rr"]
+            },
+            "bradypnea": {
+                check: (data) => {
+                    const ageGroup = data.ageGroup;
+                    return data.respiratoryRate < PEDIATRIC_REFERENCE[ageGroup].respiratoryRateRange[0];
+                },
+                terms: ["bradypnea", "decreased rr", "low rr"]
+            },
+            "hypertension": {
+                check: (data) => {
+                    const ageGroup = data.ageGroup;
+                    let maxSystolic, maxDiastolic;
+                    
+                    if (ageGroup === 'INFANT' || ageGroup === 'ADOLESCENT') {
+                        maxSystolic = PEDIATRIC_REFERENCE[ageGroup].bpRange.systolic[1];
+                        maxDiastolic = PEDIATRIC_REFERENCE[ageGroup].bpRange.diastolic[1];
+                    } else {
+                        maxSystolic = PEDIATRIC_REFERENCE[ageGroup].bpRange[data.age].systolic[1];
+                        maxDiastolic = PEDIATRIC_REFERENCE[ageGroup].bpRange[data.age].diastolic[1];
+                    }
+                    
+                    return data.systolic > maxSystolic || data.diastolic > maxDiastolic;
+                },
+                terms: ["hypertension", "htn", "high bp", "elevated bp"]
+            },
+            "hypotension": {
+                check: (data) => {
+                    const ageGroup = data.ageGroup;
+                    let minSystolic, minDiastolic;
+                    
+                    if (ageGroup === 'INFANT' || ageGroup === 'ADOLESCENT') {
+                        minSystolic = PEDIATRIC_REFERENCE[ageGroup].bpRange.systolic[0];
+                        minDiastolic = PEDIATRIC_REFERENCE[ageGroup].bpRange.diastolic[0];
+                    } else {
+                        minSystolic = PEDIATRIC_REFERENCE[ageGroup].bpRange[data.age].systolic[0];
+                        minDiastolic = PEDIATRIC_REFERENCE[ageGroup].bpRange[data.age].diastolic[0];
+                    }
+                    
+                    return data.systolic < minSystolic || data.diastolic < minDiastolic;
+                },
+                terms: ["hypotension", "low bp", "decreased bp"]
+            },
+            "fever": {
+                check: (data) => {
+                    return data.temperature > 38.0;
+                },
+                terms: ["fever", "febrile", "hyperthermia", "pyrexia", "high temp", "elevated temp"]
+            },
+            "hypothermia": {
+                check: (data) => {
+                    return data.temperature < 36.0;
+                },
+                terms: ["hypothermia", "low temp", "decreased temp"]
+            },
+            "oliguria": {
+                check: (data) => {
+                    // Pediatric oliguria is typically defined as <0.5-1 mL/kg/hr
+                    const expectedMinOutput = data.weight * 0.5 * 24; // mL per 24 hours
+                    return data.urineOutput < expectedMinOutput;
+                },
+                terms: ["oliguria", "decreased uo", "low uo", "low urine output"]
+            },
+            "polyuria": {
+                check: (data) => {
+                    // Excessive urine output
+                    const expectedMaxOutput = data.weight * 4 * 24; // mL per 24 hours (approximation)
+                    return data.urineOutput > expectedMaxOutput;
+                },
+                terms: ["polyuria", "increased uo", "high uo", "high urine output"]
+            },
+            "dehydration": {
+                check: (data) => {
+                    // Signs of dehydration can include tachycardia, decreased urine output
+                    const hasTachycardia = CLINICAL_CONDITIONS["tachycardia"].check(data);
+                    const hasOliguria = data.urineOutput ? CLINICAL_CONDITIONS["oliguria"].check(data) : false;
+                    
+                    return hasTachycardia && hasOliguria;
+                },
+                terms: ["dehydration", "dehydrated", "volume depleted", "hypovolemia"]
+            },
+            "shock": {
+                check: (data) => {
+                    // Signs of shock can include hypotension + tachycardia
+                    const hasHypotension = CLINICAL_CONDITIONS["hypotension"].check(data);
+                    const hasTachycardia = CLINICAL_CONDITIONS["tachycardia"].check(data);
+                    
+                    return hasHypotension && hasTachycardia;
+                },
+                terms: ["shock", "circulatory failure"]
+            },
+            "sepsis": {
+                check: (data) => {
+                    // Simplified definition: fever + tachycardia + tachypnea
+                    const hasFever = data.temperature ? data.temperature > 38.0 : false;
+                    const hasTachycardia = CLINICAL_CONDITIONS["tachycardia"].check(data);
+                    const hasTachypnea = data.respiratoryRate ? CLINICAL_CONDITIONS["tachypnea"].check(data) : false;
+                    
+                    return hasFever && (hasTachycardia || hasTachypnea);
+                },
+                terms: ["sepsis", "septic", "infection", "sirs"]
             }
         };
 
@@ -352,18 +653,23 @@
 
         function startGame() {
             // Reset game state
-            score = 0;
-            correctCount = 0;
-            incorrectCount = 0;
-            timeoutCount = 0;
-            updateScoreDisplay();
+            if (startButton.textContent === 'Start Game') {
+                score = 0;
+                correctCount = 0;
+                incorrectCount = 0;
+                timeoutCount = 0;
+                updateScoreDisplay();
+                startButton.textContent = 'Next Scenario';
+            }
             
             // Update UI
-            startButton.textContent = 'Next Scenario';
             answerInput.disabled = false;
             submitButton.disabled = false;
+            answerInput.value = '';
+            feedbackDisplay.textContent = '';
+            feedbackDisplay.className = 'feedback';
             
-            // Generate first scenario
+            // Generate new scenario
             generateNewScenario();
         }
 
@@ -374,58 +680,229 @@
             feedbackDisplay.className = 'feedback';
             answerInput.focus();
             
-            // Generate scenario
-            currentScenario = generateRandomScenario();
+            // Generate patient data
+            currentPatientData = generatePatientData();
+            
+            // Format scenario text
+            currentScenario = formatScenario(currentPatientData);
             scenarioDisplay.textContent = currentScenario;
+            
+            // Determine abnormalities in this scenario
+            currentAbnormalities = determineAbnormalities(currentPatientData);
             
             // Start timer
             startTimer();
         }
 
-        function generateRandomScenario() {
-            // Always include weight
-            const weight = getRandomNumber(VITAL_SIGNS.weight.min, VITAL_SIGNS.weight.max);
-            let scenario = `${weight} ${VITAL_SIGNS.weight.unit}`;
+        function generatePatientData() {
+            // Choose random age group
+            const ageGroups = Object.keys(PEDIATRIC_REFERENCE);
+            const ageGroup = ageGroups[Math.floor(Math.random() * ageGroups.length)];
+            const refData = PEDIATRIC_REFERENCE[ageGroup];
             
-            // Randomly select 1-4 additional vital signs
-            const vitalSignTypes = ['heartRate', 'bloodPressure', 'temperature', 'respiratoryRate', 'urineOutput'];
-            const shuffledVitalSigns = vitalSignTypes.sort(() => 0.5 - Math.random());
-            const numberOfVitalSigns = getRandomNumber(1, 4);
+            // Determine age based on age group
+            let age;
+            let ageDisplay;
             
+            if (ageGroup === 'INFANT' || ageGroup === 'ADOLESCENT') {
+                ageDisplay = refData.ageDisplay();
+                age = ageDisplay.split(' ')[0]; // Extract numeric part
+            } else {
+                age = refData.ageOptions[Math.floor(Math.random() * refData.ageOptions.length)];
+                ageDisplay = `${age} years`;
+            }
+            
+            // Gender
+            const gender = Math.random() > 0.5 ? 'male' : 'female';
+            
+            // Generate weight
+            const weightMin = refData.weightRange[0];
+            const weightMax = refData.weightRange[1];
+            const weight = getRandomNumber(weightMin, weightMax, 1);
+            
+            // Patient data object
+            const patientData = {
+                ageGroup: ageGroup,
+                age: age,
+                ageDisplay: ageDisplay,
+                gender: gender,
+                weight: weight
+            };
+            
+            // Randomly determine which vital signs to include (always include at least 2)
+            const vitalSigns = ['heartRate', 'bloodPressure', 'temperature', 'respiratoryRate', 'urineOutput'];
+            const shuffledVitalSigns = vitalSigns.sort(() => 0.5 - Math.random());
+            const numberOfVitalSigns = getRandomNumber(2, 4);
+            
+            // Ensure we have plenty of abnormal cases (60% chance)
+            const includeAbnormal = Math.random() < 0.6;
+            
+            // Generate vital signs
             for (let i = 0; i < numberOfVitalSigns; i++) {
                 const vitalSign = shuffledVitalSigns[i];
                 
                 switch (vitalSign) {
                     case 'heartRate':
-                        const hr = getRandomNumber(VITAL_SIGNS.heartRate.min, VITAL_SIGNS.heartRate.max);
-                        scenario += `, HR: ${hr} ${VITAL_SIGNS.heartRate.unit}`;
+                        const hrMin = refData.heartRateRange[0];
+                        const hrMax = refData.heartRateRange[1];
+                        
+                        // Sometimes generate abnormal values
+                        if (includeAbnormal && Math.random() < 0.5) {
+                            // Either too high or too low
+                            if (Math.random() < 0.7) {
+                                // Tachycardia (more common)
+                                patientData.heartRate = getRandomNumber(hrMax + 5, hrMax + 40);
+                            } else {
+                                // Bradycardia
+                                patientData.heartRate = getRandomNumber(hrMin - 20, hrMin - 5);
+                            }
+                        } else {
+                            // Normal
+                            patientData.heartRate = getRandomNumber(hrMin, hrMax);
+                        }
                         break;
+                        
                     case 'bloodPressure':
-                        const systolic = getRandomNumber(VITAL_SIGNS.bloodPressure.systolicMin, VITAL_SIGNS.bloodPressure.systolicMax);
-                        const diastolic = getRandomNumber(VITAL_SIGNS.bloodPressure.diastolicMin, VITAL_SIGNS.bloodPressure.diastolicMax);
-                        scenario += `, BP: ${systolic}/${diastolic}`;
+                        let sysMin, sysMax, diaMin, diaMax;
+                        
+                        if (ageGroup === 'INFANT' || ageGroup === 'ADOLESCENT') {
+                            sysMin = refData.bpRange.systolic[0];
+                            sysMax = refData.bpRange.systolic[1];
+                            diaMin = refData.bpRange.diastolic[0];
+                            diaMax = refData.bpRange.diastolic[1];
+                        } else {
+                            sysMin = refData.bpRange[age].systolic[0];
+                            sysMax = refData.bpRange[age].systolic[1];
+                            diaMin = refData.bpRange[age].diastolic[0];
+                            diaMax = refData.bpRange[age].diastolic[1];
+                        }
+                        
+                        // Sometimes generate abnormal values
+                        if (includeAbnormal && Math.random() < 0.5) {
+                            // Either too high or too low
+                            if (Math.random() < 0.5) {
+                                // Hypertension
+                                patientData.systolic = getRandomNumber(sysMax + 5, sysMax + 30);
+                                patientData.diastolic = getRandomNumber(diaMax + 5, diaMax + 20);
+                            } else {
+                                // Hypotension
+                                patientData.systolic = getRandomNumber(sysMin - 20, sysMin - 5);
+                                patientData.diastolic = getRandomNumber(diaMin - 15, diaMin - 3);
+                            }
+                        } else {
+                            // Normal
+                            patientData.systolic = getRandomNumber(sysMin, sysMax);
+                            patientData.diastolic = getRandomNumber(diaMin, diaMax);
+                        }
                         break;
+                        
                     case 'temperature':
-                        const temp = getRandomNumber(VITAL_SIGNS.temperature.min, VITAL_SIGNS.temperature.max, 1);
-                        scenario += `, Temp: ${temp} ${VITAL_SIGNS.temperature.unit}`;
+                        // Normal is about 36.5-37.5
+                        if (includeAbnormal && Math.random() < 0.6) {
+                            // Fever more common than hypothermia
+                            if (Math.random() < 0.8) {
+                                // Fever
+                                patientData.temperature = getRandomNumber(38.1, 40.5, 1);
+                            } else {
+                                // Hypothermia
+                                patientData.temperature = getRandomNumber(34.5, 35.9, 1);
+                            }
+                        } else {
+                            // Normal
+                            patientData.temperature = getRandomNumber(36.5, 37.5, 1);
+                        }
                         break;
+                        
                     case 'respiratoryRate':
-                        const rr = getRandomNumber(VITAL_SIGNS.respiratoryRate.min, VITAL_SIGNS.respiratoryRate.max);
-                        scenario += `, RR: ${rr} ${VITAL_SIGNS.respiratoryRate.unit}`;
+                        const rrMin = refData.respiratoryRateRange[0];
+                        const rrMax = refData.respiratoryRateRange[1];
+                        
+                        // Sometimes generate abnormal values
+                        if (includeAbnormal && Math.random() < 0.5) {
+                            // Either too high or too low
+                            if (Math.random() < 0.8) {
+                                // Tachypnea (more common)
+                                patientData.respiratoryRate = getRandomNumber(rrMax + 5, rrMax + 30);
+                            } else {
+                                // Bradypnea
+                                patientData.respiratoryRate = getRandomNumber(rrMin - 10, rrMin - 2);
+                            }
+                        } else {
+                            // Normal
+                            patientData.respiratoryRate = getRandomNumber(rrMin, rrMax);
+                        }
                         break;
+                        
                     case 'urineOutput':
-                        const uo = getRandomNumber(VITAL_SIGNS.urineOutput.min, VITAL_SIGNS.urineOutput.max);
-                        scenario += `, UO: ${uo} ${VITAL_SIGNS.urineOutput.unit}`;
+                        // Normal is about 1-3 mL/kg/hr
+                        const expectedOutput = weight * getRandomNumber(1, 3, 1) * 24; // mL per 24 hours
+                        
+                        if (includeAbnormal && Math.random() < 0.5) {
+                            if (Math.random() < 0.7) {
+                                // Oliguria (more common)
+                                patientData.urineOutput = Math.round(expectedOutput * getRandomNumber(0.1, 0.4, 1));
+                            } else {
+                                // Polyuria
+                                patientData.urineOutput = Math.round(expectedOutput * getRandomNumber(5, 8, 1));
+                            }
+                        } else {
+                            // Normal
+                            patientData.urineOutput = Math.round(expectedOutput);
+                        }
                         break;
                 }
+            }
+            
+            return patientData;
+        }
+
+        function formatScenario(data) {
+            let scenario = `${data.ageDisplay}, ${data.gender}, ${data.weight} kg`;
+            
+            if (data.heartRate !== undefined) {
+                scenario += `, HR: ${data.heartRate} bpm`;
+            }
+            
+            if (data.systolic !== undefined && data.diastolic !== undefined) {
+                scenario += `, BP: ${data.systolic}/${data.diastolic} mmHg`;
+            }
+            
+            if (data.temperature !== undefined) {
+                scenario += `, Temp: ${data.temperature}°C`;
+            }
+            
+            if (data.respiratoryRate !== undefined) {
+                scenario += `, RR: ${data.respiratoryRate}/min`;
+            }
+            
+            if (data.urineOutput !== undefined) {
+                scenario += `, UO: ${data.urineOutput} mL/24hr`;
             }
             
             return scenario;
         }
 
+        function determineAbnormalities(data) {
+            const abnormalities = [];
+            
+            for (const condition in CLINICAL_CONDITIONS) {
+                const conditionCheck = CLINICAL_CONDITIONS[condition].check;
+                try {
+                    if (conditionCheck(data)) {
+                        abnormalities.push(condition);
+                    }
+                } catch (e) {
+                    // Skip conditions that require vital signs not present in this scenario
+                    console.log(`Skipping condition check for ${condition}: ${e.message}`);
+                }
+            }
+            
+            return abnormalities;
+        }
+
         function getRandomNumber(min, max, decimals = 0) {
             const factor = Math.pow(10, decimals);
-            return (Math.random() * (max - min) + min).toFixed(decimals) * 1;
+            return Number(((Math.random() * (max - min) + min) * factor / factor).toFixed(decimals));
         }
 
         function startTimer() {
@@ -456,7 +933,15 @@
             
             // Visual feedback
             flashScreen();
-            feedbackDisplay.textContent = 'Time expired!';
+            
+            let correctAnswers = '';
+            if (currentAbnormalities.length > 0) {
+                correctAnswers = currentAbnormalities.join(', ');
+            } else {
+                correctAnswers = 'normal vitals';
+            }
+            
+            feedbackDisplay.textContent = `Time expired! The abnormalities were: ${correctAnswers}`;
             feedbackDisplay.className = 'feedback incorrect';
             
             // Disable input until next round
@@ -465,10 +950,7 @@
             
             // Re-enable after a delay
             setTimeout(() => {
-                if (startButton.textContent === 'Next Scenario') {
-                    answerInput.disabled = false;
-                    submitButton.disabled = false;
-                }
+                submitButton.disabled = false;
             }, 1500);
         }
 
@@ -477,7 +959,7 @@
             clearInterval(timerInterval);
             
             // Get user's answer
-            const userAnswer = answerInput.value.trim();
+            const userAnswer = answerInput.value.trim().toLowerCase();
             
             if (userAnswer === '') {
                 // If no answer, treat as timeout
@@ -488,113 +970,197 @@
             // Disable inputs while checking
             answerInput.disabled = true;
             submitButton.disabled = true;
-            startButton.disabled = true;
             
-            // Show loading state
-            feedbackDisplay.textContent = 'Checking...';
-            
-            // Call API to check answer
-            checkAnswer(currentScenario, userAnswer);
+            // Check answer
+            const result = checkAnswer(userAnswer);
+            handleAnswerResult(result);
         }
 
-        function checkAnswer(scenario, userResponse) {
-            // NOTE: In production, you should NOT expose your API key in client-side code.
-            // Use a backend proxy server instead.
+        function checkAnswer(userAnswer) {
+            // Show loading state
+            feedbackDisplay.textContent = 'Checking with AI...';
             
+            // Get reference vitals for this patient's age
+            const refVitals = getReferenceVitals(currentPatientData);
+            
+            // Create an object with the current case details to send to the AI
+            const aiRequest = {
+                patient: currentPatientData,
+                reference: refVitals,
+                userResponse: userAnswer,
+                abnormalities: currentAbnormalities
+            };
+            
+            // Call the AI API to evaluate the response
+            callAiApi(aiRequest);
+            
+            // Return a placeholder result while waiting for the API
+            return null;
+        }
+        
+        function getReferenceVitals(patientData) {
+            const ageGroup = patientData.ageGroup;
+            const refData = PEDIATRIC_REFERENCE[ageGroup];
+            let refVitals = {};
+            
+            if (ageGroup === 'INFANT' || ageGroup === 'ADOLESCENT') {
+                refVitals = {
+                    heartRateRange: refData.heartRateRange,
+                    respiratoryRateRange: refData.respiratoryRateRange,
+                    bpRange: refData.bpRange
+                };
+            } else {
+                refVitals = {
+                    heartRateRange: refData.heartRateRange,
+                    respiratoryRateRange: refData.respiratoryRateRange,
+                    bpRange: refData.bpRange[patientData.age]
+                };
+            }
+            
+            return refVitals;
+        }
+        
+        function callAiApi(requestData) {
+            // Format the data for the AI assessment
+            const formattedRequest = formatAiRequest(requestData);
+            
+            // In production, call the actual API endpoint
+            // For now, we'll simulate the AI response after a short delay
+            setTimeout(() => {
+                simulateAiResponse(requestData);
+            }, 1500);
+        }
+        
+        function formatAiRequest(requestData) {
+            // Create a well-formatted prompt for the AI
+            const patient = requestData.patient;
+            const ref = requestData.reference;
+            
+            let prompt = `
+            PEDIATRIC CLINICAL SCENARIO ASSESSMENT
+            
+            PATIENT DATA:
+            Age: ${patient.ageDisplay}
+            Weight: ${patient.weight} kg
+            `;
+            
+            // Add vital signs that are present
+            if (patient.heartRate !== undefined) {
+                prompt += `Heart Rate: ${patient.heartRate} bpm (Normal range: ${ref.heartRateRange[0]}-${ref.heartRateRange[1]} bpm)\n`;
+            }
+            
+            if (patient.systolic !== undefined && patient.diastolic !== undefined) {
+                const bpRef = ref.bpRange;
+                let sysRange, diaRange;
+                
+                if (Array.isArray(bpRef.systolic)) {
+                    sysRange = `${bpRef.systolic[0]}-${bpRef.systolic[1]}`;
+                    diaRange = `${bpRef.diastolic[0]}-${bpRef.diastolic[1]}`;
+                } else {
+                    sysRange = `${bpRef.systolic[0]}-${bpRef.systolic[1]}`;
+                    diaRange = `${bpRef.diastolic[0]}-${bpRef.diastolic[1]}`;
+                }
+                
+                prompt += `Blood Pressure: ${patient.systolic}/${patient.diastolic} mmHg (Normal range: ${sysRange}/${diaRange} mmHg)\n`;
+            }
+            
+            if (patient.temperature !== undefined) {
+                prompt += `Temperature: ${patient.temperature}°C (Normal range: 36.5-37.5°C)\n`;
+            }
+            
+            if (patient.respiratoryRate !== undefined) {
+                prompt += `Respiratory Rate: ${patient.respiratoryRate}/min (Normal range: ${ref.respiratoryRateRange[0]}-${ref.respiratoryRateRange[1]}/min)\n`;
+            }
+            
+            if (patient.urineOutput !== undefined) {
+                const expectedOutput = patient.weight * 1 * 24; // Minimal normal (1 mL/kg/hr)
+                const maxOutput = patient.weight * 4 * 24; // Maximum normal (4 mL/kg/hr)
+                prompt += `Urine Output: ${patient.urineOutput} mL/24hr (Normal range: ${Math.round(expectedOutput)}-${Math.round(maxOutput)} mL/24hr)\n`;
+            }
+            
+            prompt += `\nUSER'S ASSESSMENT: "${requestData.userResponse}"\n`;
+            
+            // Prepare the payload for the API
             const payload = {
                 model: "gpt-4o",
                 messages: [
                     { 
                         role: "system", 
                         content: "You are evaluating a medical student's response to pediatric clinical scenarios. " +
-                                 "Your job is to determine if their interpretation is correct based on the vital signs provided. " +
-                                 "Respond with ONLY 'CORRECT' or 'INCORRECT' followed by a very brief explanation (1-2 sentences)."
+                                "Your job is to determine if their interpretation is correct based on the vital signs provided. " +
+                                "Respond with ONLY 'CORRECT' or 'INCORRECT' followed by a very brief explanation (1-2 sentences)."
                     },
                     { 
                         role: "user", 
-                        content: `Scenario: ${scenario}\nStudent's interpretation: ${userResponse}`
+                        content: prompt
                     }
                 ]
             };
-
-            // In a real production app, this would call your backend proxy
-            // For this demo, we'll simulate API response
-            simulateApiResponse(userResponse, scenario);
+            
+            return payload;
         }
-
-        // This simulates what the API would return
-        // In a real app, this would be replaced with the actual API call
-        function simulateApiResponse(userResponse, scenario) {
-            // Create a simulated delay to represent API call time
-            setTimeout(() => {
-                let isCorrect, explanation;
-                
-                // Simple pattern matching for common pediatric conditions
-                const normalizedResponse = userResponse.toLowerCase();
-                const vitalSigns = parseScenario(scenario);
-                
-                // Examples of very simple pattern matching logic 
-                // In reality, you would use the API for actual clinical assessment
-                if (vitalSigns.temperature > 38.0 && 
-                    normalizedResponse.includes("fever") || normalizedResponse.includes("sepsis")) {
+        
+        function simulateAiResponse(requestData) {
+            // This is a temporary function for demo purposes
+            // In production, this would be replaced with the actual API response
+            
+            const abnormalities = requestData.abnormalities;
+            const userResponse = requestData.userResponse.toLowerCase();
+            
+            let isCorrect = false;
+            let explanation = "";
+            
+            // If there are no abnormalities, check if user indicated normal/stable
+            if (abnormalities.length === 0) {
+                if (userResponse.includes('normal') || 
+                    userResponse.includes('stable') || 
+                    userResponse.includes('wnl') ||  // within normal limits
+                    userResponse.includes('healthy')) {
                     isCorrect = true;
-                    explanation = "Correct identification of febrile state.";
-                } 
-                else if (vitalSigns.heartRate > 160 && 
-                         normalizedResponse.includes("tachycardia") || normalizedResponse.includes("shock")) {
-                    isCorrect = true;
-                    explanation = "Correctly identified elevated heart rate.";
-                }
-                else if (vitalSigns.systolic < 80 && vitalSigns.weight > 15 &&
-                         normalizedResponse.includes("hypotension") || normalizedResponse.includes("shock")) {
-                    isCorrect = true;
-                    explanation = "Good catch on the low blood pressure.";
-                }
-                else if (Math.random() > 0.65) { // Random correct answers for demo purposes
-                    isCorrect = true;
-                    explanation = "Your assessment matches the expected interpretation.";
-                }
-                else {
+                    explanation = "Correct! All vital signs are within normal limits.";
+                } else {
                     isCorrect = false;
-                    explanation = "The interpretation doesn't match the clinical picture.";
+                    explanation = "Incorrect. All vital signs are actually within normal limits.";
+                }
+            } else {
+                // Check for matches with known abnormalities
+                let matches = 0;
+                
+                for (const abnormality of abnormalities) {
+                    const terms = CLINICAL_CONDITIONS[abnormality].terms;
+                    if (terms.some(term => userResponse.includes(term))) {
+                        matches++;
+                    }
                 }
                 
-                handleApiResponse(isCorrect, explanation);
-            }, 1000);
-        }
-
-        function parseScenario(scenario) {
-            const vitals = {};
-            vitals.weight = parseFloat(scenario.match(/(\d+\.?\d*) kg/)?.[1] || 0);
-            
-            const hrMatch = scenario.match(/HR: (\d+)/);
-            if (hrMatch) vitals.heartRate = parseInt(hrMatch[1]);
-            
-            const bpMatch = scenario.match(/BP: (\d+)\/(\d+)/);
-            if (bpMatch) {
-                vitals.systolic = parseInt(bpMatch[1]);
-                vitals.diastolic = parseInt(bpMatch[2]);
+                if (matches === abnormalities.length) {
+                    isCorrect = true;
+                    explanation = `Excellent! You correctly identified all abnormalities: ${abnormalities.join(', ')}.`;
+                } else if (matches > 0) {
+                    isCorrect = true;
+                    explanation = `Partially correct. You identified ${matches}/${abnormalities.length} abnormalities. The complete answer: ${abnormalities.join(', ')}.`;
+                } else {
+                    isCorrect = false;
+                    explanation = `Incorrect. The abnormalities were: ${abnormalities.join(', ')}.`;
+                }
             }
             
-            const tempMatch = scenario.match(/Temp: (\d+\.?\d*)/);
-            if (tempMatch) vitals.temperature = parseFloat(tempMatch[1]);
+            // In production, we would parse the AI response here
+            const result = {
+                correct: isCorrect,
+                message: explanation
+            };
             
-            const rrMatch = scenario.match(/RR: (\d+)/);
-            if (rrMatch) vitals.respiratoryRate = parseInt(rrMatch[1]);
-            
-            const uoMatch = scenario.match(/UO: (\d+)/);
-            if (uoMatch) vitals.urineOutput = parseInt(uoMatch[1]);
-            
-            return vitals;
+            handleAnswerResult(result);
         }
 
-        function handleApiResponse(isCorrect, explanation) {
+        function handleAnswerResult(result) {
             // Update score
-            const points = isCorrect ? 1 : -1;
+            const points = result.correct ? 1 : -1;
             updateScore(points);
             
             // Update counters
-            if (isCorrect) {
+            if (result.correct) {
                 correctCount++;
                 correctCountDisplay.textContent = correctCount;
             } else {
@@ -604,8 +1170,8 @@
             }
             
             // Display feedback
-            feedbackDisplay.textContent = `${isCorrect ? 'Correct' : 'Incorrect'}: ${explanation}`;
-            feedbackDisplay.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedbackDisplay.textContent = result.message;
+            feedbackDisplay.className = `feedback ${result.correct ? 'correct' : 'incorrect'}`;
             
             // Re-enable controls after a delay
             setTimeout(() => {

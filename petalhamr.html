@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pediatric Clinical Scenario Quiz</title>
+    <style>
+        :root {
+            --primary-color: #4a86e8;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+            --neutral-color: #ecf0f1;
+            --text-color: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            transition: background-color 0.5s;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .scenario-box {
+            background-color: var(--neutral-color);
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .timer-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .timer {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            width: 60px;
+            text-align: center;
+        }
+
+        .slider-container {
+            margin-bottom: 20px;
+        }
+
+        .slider-container label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .slider {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #3a76d8;
+        }
+
+        button:disabled {
+            background-color: #b2c1e0;
+            cursor: not-allowed;
+        }
+
+        .score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 25px;
+        }
+
+        .feedback.correct {
+            color: var(--success-color);
+        }
+
+        .feedback.incorrect {
+            color: var(--error-color);
+        }
+
+        .flash {
+            animation: flashRed 0.5s;
+        }
+
+        @keyframes flashRed {
+            0% { background-color: rgba(231, 76, 60, 0.7); }
+            100% { background-color: white; }
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .stats {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--neutral-color);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .loading {
+            position: relative;
+        }
+
+        .loading::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s infinite linear;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* For smaller screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .scenario-box {
+                font-size: 1rem;
+                padding: 15px;
+            }
+            
+            .timer {
+                font-size: 1.5rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="game-container">
+        <h1>Pediatric Clinical Scenario Quiz</h1>
+        
+        <div class="section">
+            <div class="slider-container">
+                <label for="timer-slider">Time Per Question: <span id="timer-value">5</span> seconds</label>
+                <input type="range" id="timer-slider" class="slider" min="1" max="10" value="5">
+            </div>
+            
+            <div class="timer-container">
+                <div class="timer" id="timer">5</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="scenario-box" id="scenario">
+                Click "Start Game" to begin...
+            </div>
+            
+            <input type="text" id="answer-input" placeholder="Type your answer here..." disabled>
+            
+            <div class="feedback" id="feedback"></div>
+        </div>
+        
+        <div class="controls">
+            <button id="start-btn">Start Game</button>
+            <button id="submit-btn" disabled>Submit</button>
+        </div>
+        
+        <div class="score" id="score">Score: 0</div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div>Correct</div>
+                <div id="correct-count">0</div>
+            </div>
+            <div class="stat-item">
+                <div>Incorrect</div>
+                <div id="incorrect-count">0</div>
+            </div>
+            <div class="stat-item">
+                <div>Timeouts</div>
+                <div id="timeout-count">0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const gameContainer = document.getElementById('game-container');
+        const timerSlider = document.getElementById('timer-slider');
+        const timerValueDisplay = document.getElementById('timer-value');
+        const timerDisplay = document.getElementById('timer');
+        const scenarioDisplay = document.getElementById('scenario');
+        const answerInput = document.getElementById('answer-input');
+        const feedbackDisplay = document.getElementById('feedback');
+        const startButton = document.getElementById('start-btn');
+        const submitButton = document.getElementById('submit-btn');
+        const scoreDisplay = document.getElementById('score');
+        const correctCountDisplay = document.getElementById('correct-count');
+        const incorrectCountDisplay = document.getElementById('incorrect-count');
+        const timeoutCountDisplay = document.getElementById('timeout-count');
+
+        // Game State
+        let gameActive = false;
+        let timeRemaining = 5;
+        let timerInterval;
+        let currentScenario = '';
+        let score = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let timeoutCount = 0;
+
+        // Constants for vital signs ranges
+        const VITAL_SIGNS = {
+            weight: {
+                min: 3,
+                max: 50,
+                unit: 'kg'
+            },
+            heartRate: {
+                min: 60,
+                max: 200,
+                unit: 'bpm'
+            },
+            bloodPressure: {
+                systolicMin: 70,
+                systolicMax: 140,
+                diastolicMin: 40,
+                diastolicMax: 90,
+                unit: ''
+            },
+            temperature: {
+                min: 35.0,
+                max: 40.0,
+                unit: '°C'
+            },
+            respiratoryRate: {
+                min: 12,
+                max: 60,
+                unit: '/min'
+            },
+            urineOutput: {
+                min: 100,
+                max: 2000,
+                unit: 'mL/24hr'
+            }
+        };
+
+        // Event Listeners
+        timerSlider.addEventListener('input', updateTimerValue);
+        startButton.addEventListener('click', startGame);
+        submitButton.addEventListener('click', submitAnswer);
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                submitAnswer();
+            }
+        });
+
+        // Initialize timer value display
+        updateTimerValue();
+
+        // Functions
+        function updateTimerValue() {
+            const value = timerSlider.value;
+            timerValueDisplay.textContent = value;
+            timerDisplay.textContent = value;
+            timeRemaining = value;
+        }
+
+        function startGame() {
+            // Reset game state
+            score = 0;
+            correctCount = 0;
+            incorrectCount = 0;
+            timeoutCount = 0;
+            updateScoreDisplay();
+            
+            // Update UI
+            startButton.textContent = 'Next Scenario';
+            answerInput.disabled = false;
+            submitButton.disabled = false;
+            
+            // Generate first scenario
+            generateNewScenario();
+        }
+
+        function generateNewScenario() {
+            // Clear previous data
+            answerInput.value = '';
+            feedbackDisplay.textContent = '';
+            feedbackDisplay.className = 'feedback';
+            answerInput.focus();
+            
+            // Generate scenario
+            currentScenario = generateRandomScenario();
+            scenarioDisplay.textContent = currentScenario;
+            
+            // Start timer
+            startTimer();
+        }
+
+        function generateRandomScenario() {
+            // Always include weight
+            const weight = getRandomNumber(VITAL_SIGNS.weight.min, VITAL_SIGNS.weight.max);
+            let scenario = `${weight} ${VITAL_SIGNS.weight.unit}`;
+            
+            // Randomly select 1-4 additional vital signs
+            const vitalSignTypes = ['heartRate', 'bloodPressure', 'temperature', 'respiratoryRate', 'urineOutput'];
+            const shuffledVitalSigns = vitalSignTypes.sort(() => 0.5 - Math.random());
+            const numberOfVitalSigns = getRandomNumber(1, 4);
+            
+            for (let i = 0; i < numberOfVitalSigns; i++) {
+                const vitalSign = shuffledVitalSigns[i];
+                
+                switch (vitalSign) {
+                    case 'heartRate':
+                        const hr = getRandomNumber(VITAL_SIGNS.heartRate.min, VITAL_SIGNS.heartRate.max);
+                        scenario += `, HR: ${hr} ${VITAL_SIGNS.heartRate.unit}`;
+                        break;
+                    case 'bloodPressure':
+                        const systolic = getRandomNumber(VITAL_SIGNS.bloodPressure.systolicMin, VITAL_SIGNS.bloodPressure.systolicMax);
+                        const diastolic = getRandomNumber(VITAL_SIGNS.bloodPressure.diastolicMin, VITAL_SIGNS.bloodPressure.diastolicMax);
+                        scenario += `, BP: ${systolic}/${diastolic}`;
+                        break;
+                    case 'temperature':
+                        const temp = getRandomNumber(VITAL_SIGNS.temperature.min, VITAL_SIGNS.temperature.max, 1);
+                        scenario += `, Temp: ${temp} ${VITAL_SIGNS.temperature.unit}`;
+                        break;
+                    case 'respiratoryRate':
+                        const rr = getRandomNumber(VITAL_SIGNS.respiratoryRate.min, VITAL_SIGNS.respiratoryRate.max);
+                        scenario += `, RR: ${rr} ${VITAL_SIGNS.respiratoryRate.unit}`;
+                        break;
+                    case 'urineOutput':
+                        const uo = getRandomNumber(VITAL_SIGNS.urineOutput.min, VITAL_SIGNS.urineOutput.max);
+                        scenario += `, UO: ${uo} ${VITAL_SIGNS.urineOutput.unit}`;
+                        break;
+                }
+            }
+            
+            return scenario;
+        }
+
+        function getRandomNumber(min, max, decimals = 0) {
+            const factor = Math.pow(10, decimals);
+            return (Math.random() * (max - min) + min).toFixed(decimals) * 1;
+        }
+
+        function startTimer() {
+            // Reset timer
+            timeRemaining = parseInt(timerSlider.value);
+            timerDisplay.textContent = timeRemaining;
+            
+            // Clear any existing interval
+            clearInterval(timerInterval);
+            
+            // Start new interval
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                timerDisplay.textContent = timeRemaining;
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function handleTimeout() {
+            // Apply penalty
+            updateScore(-1);
+            timeoutCount++;
+            timeoutCountDisplay.textContent = timeoutCount;
+            
+            // Visual feedback
+            flashScreen();
+            feedbackDisplay.textContent = 'Time expired!';
+            feedbackDisplay.className = 'feedback incorrect';
+            
+            // Disable input until next round
+            answerInput.disabled = true;
+            submitButton.disabled = true;
+            
+            // Re-enable after a delay
+            setTimeout(() => {
+                if (startButton.textContent === 'Next Scenario') {
+                    answerInput.disabled = false;
+                    submitButton.disabled = false;
+                }
+            }, 1500);
+        }
+
+        function submitAnswer() {
+            // Stop the timer
+            clearInterval(timerInterval);
+            
+            // Get user's answer
+            const userAnswer = answerInput.value.trim();
+            
+            if (userAnswer === '') {
+                // If no answer, treat as timeout
+                handleTimeout();
+                return;
+            }
+            
+            // Disable inputs while checking
+            answerInput.disabled = true;
+            submitButton.disabled = true;
+            startButton.disabled = true;
+            
+            // Show loading state
+            feedbackDisplay.textContent = 'Checking...';
+            
+            // Call API to check answer
+            checkAnswer(currentScenario, userAnswer);
+        }
+
+        function checkAnswer(scenario, userResponse) {
+            // NOTE: In production, you should NOT expose your API key in client-side code.
+            // Use a backend proxy server instead.
+            
+            const payload = {
+                model: "gpt-4o",
+                messages: [
+                    { 
+                        role: "system", 
+                        content: "You are evaluating a medical student's response to pediatric clinical scenarios. " +
+                                 "Your job is to determine if their interpretation is correct based on the vital signs provided. " +
+                                 "Respond with ONLY 'CORRECT' or 'INCORRECT' followed by a very brief explanation (1-2 sentences)."
+                    },
+                    { 
+                        role: "user", 
+                        content: `Scenario: ${scenario}\nStudent's interpretation: ${userResponse}`
+                    }
+                ]
+            };
+
+            // In a real production app, this would call your backend proxy
+            // For this demo, we'll simulate API response
+            simulateApiResponse(userResponse, scenario);
+        }
+
+        // This simulates what the API would return
+        // In a real app, this would be replaced with the actual API call
+        function simulateApiResponse(userResponse, scenario) {
+            // Create a simulated delay to represent API call time
+            setTimeout(() => {
+                let isCorrect, explanation;
+                
+                // Simple pattern matching for common pediatric conditions
+                const normalizedResponse = userResponse.toLowerCase();
+                const vitalSigns = parseScenario(scenario);
+                
+                // Examples of very simple pattern matching logic 
+                // In reality, you would use the API for actual clinical assessment
+                if (vitalSigns.temperature > 38.0 && 
+                    normalizedResponse.includes("fever") || normalizedResponse.includes("sepsis")) {
+                    isCorrect = true;
+                    explanation = "Correct identification of febrile state.";
+                } 
+                else if (vitalSigns.heartRate > 160 && 
+                         normalizedResponse.includes("tachycardia") || normalizedResponse.includes("shock")) {
+                    isCorrect = true;
+                    explanation = "Correctly identified elevated heart rate.";
+                }
+                else if (vitalSigns.systolic < 80 && vitalSigns.weight > 15 &&
+                         normalizedResponse.includes("hypotension") || normalizedResponse.includes("shock")) {
+                    isCorrect = true;
+                    explanation = "Good catch on the low blood pressure.";
+                }
+                else if (Math.random() > 0.65) { // Random correct answers for demo purposes
+                    isCorrect = true;
+                    explanation = "Your assessment matches the expected interpretation.";
+                }
+                else {
+                    isCorrect = false;
+                    explanation = "The interpretation doesn't match the clinical picture.";
+                }
+                
+                handleApiResponse(isCorrect, explanation);
+            }, 1000);
+        }
+
+        function parseScenario(scenario) {
+            const vitals = {};
+            vitals.weight = parseFloat(scenario.match(/(\d+\.?\d*) kg/)?.[1] || 0);
+            
+            const hrMatch = scenario.match(/HR: (\d+)/);
+            if (hrMatch) vitals.heartRate = parseInt(hrMatch[1]);
+            
+            const bpMatch = scenario.match(/BP: (\d+)\/(\d+)/);
+            if (bpMatch) {
+                vitals.systolic = parseInt(bpMatch[1]);
+                vitals.diastolic = parseInt(bpMatch[2]);
+            }
+            
+            const tempMatch = scenario.match(/Temp: (\d+\.?\d*)/);
+            if (tempMatch) vitals.temperature = parseFloat(tempMatch[1]);
+            
+            const rrMatch = scenario.match(/RR: (\d+)/);
+            if (rrMatch) vitals.respiratoryRate = parseInt(rrMatch[1]);
+            
+            const uoMatch = scenario.match(/UO: (\d+)/);
+            if (uoMatch) vitals.urineOutput = parseInt(uoMatch[1]);
+            
+            return vitals;
+        }
+
+        function handleApiResponse(isCorrect, explanation) {
+            // Update score
+            const points = isCorrect ? 1 : -1;
+            updateScore(points);
+            
+            // Update counters
+            if (isCorrect) {
+                correctCount++;
+                correctCountDisplay.textContent = correctCount;
+            } else {
+                incorrectCount++;
+                incorrectCountDisplay.textContent = incorrectCount;
+                flashScreen();
+            }
+            
+            // Display feedback
+            feedbackDisplay.textContent = `${isCorrect ? 'Correct' : 'Incorrect'}: ${explanation}`;
+            feedbackDisplay.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            
+            // Re-enable controls after a delay
+            setTimeout(() => {
+                startButton.disabled = false;
+            }, 500);
+        }
+
+        function updateScore(points) {
+            score += points;
+            updateScoreDisplay();
+        }
+
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = `Score: ${score}`;
+        }
+
+        function flashScreen() {
+            gameContainer.classList.add('flash');
+            setTimeout(() => gameContainer.classList.remove('flash'), 500);
+        }
+    </script>
+</body>
+</html>

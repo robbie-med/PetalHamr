@@ -1142,11 +1142,18 @@ PATIENT DATA:
             
             prompt += `\nLEARNER'S ASSESSMENT: "${requestData.userResponse}"\n\n`;
             
-            prompt += `Evaluate if the learner's assessment is correct. Start your response with either "CORRECT:" or "INCORRECT:" followed by a brief explanation.
-If the learner identified all abnormalities or correctly noted normal vitals, use "CORRECT:". 
-If the learner identified some but not all abnormalities, use "PARTIALLY CORRECT:".
-If the learner identified none of the abnormalities or found problems where there are none, use "INCORRECT:".
-Always include the specific vital sign values that are abnormal.`;
+            prompt += `Evaluate if the learner's assessment is correct. 
+
+IMPORTANT: Use one of these prefixes to start your response:
+- Use "INCORRECT:" if the assessment is wrong.
+- Use "CORRECT:" only if the assessment is right.
+- Use "PARTIALLY CORRECT:" if the assessment is partially right.
+
+If the learner identified all abnormalities or correctly noted normal vitals, they are correct.
+If the learner identified some but not all abnormalities, they are partially correct.
+If the learner identified none of the abnormalities or found problems where there are none, they are incorrect.
+
+Always include the specific vital sign values that are abnormal or explain why the vital signs are normal.`;
             
             return prompt;
         }
@@ -1187,13 +1194,24 @@ Always include the specific vital sign values that are abnormal.`;
                 // Parse AI response - the content will be in choices[0].message.content
                 const aiResponse = data.choices[0].message.content;
                 
-                // Check if the response starts with CORRECT, PARTIALLY CORRECT, or INCORRECT
+                // Improved parsing of the AI's response
                 let isCorrect = false;
                 const upperResponse = aiResponse.toUpperCase();
-                if (upperResponse.startsWith('CORRECT:')) {
-                    isCorrect = true;
-                } else if (upperResponse.startsWith('PARTIALLY CORRECT:')) {
-                    isCorrect = true; // Count partial as correct but explanation will differ
+                
+                // First, check if response explicitly starts with CORRECT or PARTIALLY CORRECT
+                if (upperResponse.startsWith('CORRECT:') || upperResponse.startsWith('PARTIALLY CORRECT:')) {
+                    // Now check for contradictory content - if it says the assessment is incorrect
+                    if (
+                        aiResponse.toLowerCase().includes("assessment is incorrect") || 
+                        aiResponse.toLowerCase().includes("assessment of") && aiResponse.toLowerCase().includes("is incorrect") ||
+                        aiResponse.toLowerCase().includes("learner's") && aiResponse.toLowerCase().includes("is incorrect")
+                    ) {
+                        isCorrect = false; // Override to false if explanation contradicts the CORRECT prefix
+                    } else {
+                        isCorrect = true;
+                    }
+                } else if (upperResponse.startsWith('INCORRECT:')) {
+                    isCorrect = false;
                 }
                 
                 const result = {

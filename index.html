@@ -241,7 +241,7 @@
         <div class="section">
             <div class="slider-container">
                 <label for="timer-slider">Time Per Question: <span id="timer-value">5</span> seconds</label>
-                <input type="range" id="timer-slider" class="slider" min="1" max="10" value="5">
+                <input type="range" id="timer-slider" class="slider" min="1" max="20" value="5">
             </div>
             
             <div class="timer-container">
@@ -264,7 +264,7 @@
             <button id="submit-btn" disabled>Submit</button>
         </div>
         
-        <div class="score" id="score">Score: 0</div>
+        <div class="score" id="score">Score: 0 | Avg Time: <span id="avg-time">0.0</span>s</div>
         
         <div class="stats">
             <div class="stat-item">
@@ -439,6 +439,10 @@
         let correctCount = 0;
         let incorrectCount = 0;
         let timeoutCount = 0;
+        let startTime = 0;
+        let totalAnswerTime = 0;
+        let questionCount = 0;
+        let waitingForNextQuestion = false;
 
         // Reference data for pediatric vital signs
         const PEDIATRIC_REFERENCE = {
@@ -637,6 +641,14 @@
         answerInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 submitAnswer();
+            }
+        });
+        
+        // Global keypress listener for advancing to next question
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && waitingForNextQuestion) {
+                startGame();
+                waitingForNextQuestion = false;
             }
         });
 
@@ -913,6 +925,9 @@
             // Clear any existing interval
             clearInterval(timerInterval);
             
+            // Record start time for tracking response time
+            startTime = Date.now();
+            
             // Start new interval
             timerInterval = setInterval(() => {
                 timeRemaining--;
@@ -931,6 +946,11 @@
             timeoutCount++;
             timeoutCountDisplay.textContent = timeoutCount;
             
+            // Update time statistics (using max time since it timed out)
+            totalAnswerTime += parseInt(timerSlider.value);
+            questionCount++;
+            updateAverageTime();
+            
             // Visual feedback
             flashScreen();
             
@@ -941,22 +961,41 @@
                 correctAnswers = 'normal vitals';
             }
             
-            feedbackDisplay.textContent = `Time expired! The abnormalities were: ${correctAnswers}`;
+            // Get normal ranges
+            const normalRanges = getRelevantNormalRanges();
+            
+            // Display feedback with normal range info
+            feedbackDisplay.innerHTML = `Time expired! The abnormalities were: ${correctAnswers}<br><br>
+                <span style="font-size: 0.85em; font-weight: normal;">
+                    ${normalRanges}
+                </span>`;
             feedbackDisplay.className = 'feedback incorrect';
             
             // Disable input until next round
             answerInput.disabled = true;
             submitButton.disabled = true;
             
+            // Set up for auto-advance
+            waitingForNextQuestion = true;
+            
             // Re-enable after a delay
             setTimeout(() => {
-                submitButton.disabled = false;
+                startButton.disabled = false;
             }, 1500);
         }
 
         function submitAnswer() {
             // Stop the timer
             clearInterval(timerInterval);
+            
+            // Calculate time taken for this question
+            const endTime = Date.now();
+            const timeTaken = (endTime - startTime) / 1000; // Convert to seconds
+            
+            // Update time tracking
+            totalAnswerTime += timeTaken;
+            questionCount++;
+            updateAverageTime();
             
             // Get user's answer
             const userAnswer = answerInput.value.trim().toLowerCase();
@@ -970,10 +1009,18 @@
             // Disable inputs while checking
             answerInput.disabled = true;
             submitButton.disabled = true;
+            startButton.disabled = true;
             
-            // Check answer
-            const result = checkAnswer(userAnswer);
-            handleAnswerResult(result);
+            // Send to AI for checking
+            checkAnswer(userAnswer);
+            // Note: handleAnswerResult will be called by the AI response callback
+        }
+        
+        function updateAverageTime() {
+            if (questionCount > 0) {
+                const avgTime = (totalAnswerTime / questionCount).toFixed(1);
+                document.getElementById('avg-time').textContent = avgTime;
+            }
         }
 
         function checkAnswer(userAnswer) {
@@ -1024,11 +1071,44 @@
             // Format the data for the AI assessment
             const formattedRequest = formatAiRequest(requestData);
             
-            // In production, call the actual API endpoint
-            // For now, we'll simulate the AI response after a short delay
-            setTimeout(() => {
-                simulateAiResponse(requestData);
-            }, 1500);
+            // Here's how we would call the actual API in production
+        // (For now using a simulation for demo purposes)
+        /*
+        const payload = formatAiRequest(requestData);
+        
+        fetch("https://api.ppq.ai/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer sk-7sulP0Nq2oGR8PoB9lXAsg"  // This should be secured in production
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Parse AI response
+            const aiResponse = data.choices[0].message.content;
+            const isCorrect = aiResponse.toLowerCase().startsWith('correct');
+            const explanation = aiResponse.substring(aiResponse.indexOf(' ') + 1);
+            
+            const result = {
+                correct: isCorrect,
+                message: explanation
+            };
+            
+            handleAnswerResult(result);
+        })
+        .catch(error => {
+            console.error("API error:", error);
+            // Fall back to simple validation if API fails
+            simulateAiResponse(requestData);
+        });
+        */
+        
+        // Simulation for demo purposes
+        setTimeout(() => {
+            simulateAiResponse(requestData);
+        }, 1500);
         }
         
         function formatAiRequest(requestData) {
@@ -1106,6 +1186,7 @@
             
             const abnormalities = requestData.abnormalities;
             const userResponse = requestData.userResponse.toLowerCase();
+            const patientData = requestData.patient;
             
             let isCorrect = false;
             let explanation = "";
@@ -1117,31 +1198,61 @@
                     userResponse.includes('wnl') ||  // within normal limits
                     userResponse.includes('healthy')) {
                     isCorrect = true;
-                    explanation = "Correct! All vital signs are within normal limits.";
+                    explanation = "CORRECT: All vital signs are within normal limits for this patient's age.";
                 } else {
                     isCorrect = false;
-                    explanation = "Incorrect. All vital signs are actually within normal limits.";
+                    explanation = "INCORRECT: You identified abnormalities, but all vital signs are actually within normal limits for this patient's age.";
                 }
             } else {
                 // Check for matches with known abnormalities
                 let matches = 0;
+                let matchedAbnormalities = [];
+                let missedAbnormalities = [];
                 
                 for (const abnormality of abnormalities) {
                     const terms = CLINICAL_CONDITIONS[abnormality].terms;
                     if (terms.some(term => userResponse.includes(term))) {
                         matches++;
+                        matchedAbnormalities.push(abnormality);
+                    } else {
+                        missedAbnormalities.push(abnormality);
                     }
                 }
                 
                 if (matches === abnormalities.length) {
                     isCorrect = true;
-                    explanation = `Excellent! You correctly identified all abnormalities: ${abnormalities.join(', ')}.`;
+                    
+                    let abnormalValues = '';
+                    if (patientData.heartRate !== undefined && CLINICAL_CONDITIONS.tachycardia.check(patientData)) {
+                        abnormalValues += `HR ${patientData.heartRate} bpm (elevated), `;
+                    } else if (patientData.heartRate !== undefined && CLINICAL_CONDITIONS.bradycardia.check(patientData)) {
+                        abnormalValues += `HR ${patientData.heartRate} bpm (low), `;
+                    }
+                    
+                    if (patientData.temperature !== undefined && patientData.temperature > 38.0) {
+                        abnormalValues += `Temp ${patientData.temperature}°C (elevated), `;
+                    } else if (patientData.temperature !== undefined && patientData.temperature < 36.0) {
+                        abnormalValues += `Temp ${patientData.temperature}°C (low), `;
+                    }
+                    
+                    if (patientData.systolic !== undefined && CLINICAL_CONDITIONS.hypotension.check(patientData)) {
+                        abnormalValues += `BP ${patientData.systolic}/${patientData.diastolic} mmHg (low), `;
+                    } else if (patientData.systolic !== undefined && CLINICAL_CONDITIONS.hypertension.check(patientData)) {
+                        abnormalValues += `BP ${patientData.systolic}/${patientData.diastolic} mmHg (elevated), `;
+                    }
+                    
+                    if (abnormalValues.length > 0) {
+                        abnormalValues = abnormalValues.slice(0, -2); // Remove trailing comma
+                        explanation = `CORRECT: You identified all abnormalities: ${abnormalities.join(', ')}. Abnormal values: ${abnormalValues}.`;
+                    } else {
+                        explanation = `CORRECT: You identified all abnormalities: ${abnormalities.join(', ')}.`;
+                    }
                 } else if (matches > 0) {
                     isCorrect = true;
-                    explanation = `Partially correct. You identified ${matches}/${abnormalities.length} abnormalities. The complete answer: ${abnormalities.join(', ')}.`;
+                    explanation = `PARTIALLY CORRECT: You identified ${matches}/${abnormalities.length} abnormalities (${matchedAbnormalities.join(', ')}). You missed: ${missedAbnormalities.join(', ')}.`;
                 } else {
                     isCorrect = false;
-                    explanation = `Incorrect. The abnormalities were: ${abnormalities.join(', ')}.`;
+                    explanation = `INCORRECT: You did not identify any of the abnormalities. The abnormalities were: ${abnormalities.join(', ')}.`;
                 }
             }
             
@@ -1169,14 +1280,70 @@
                 flashScreen();
             }
             
-            // Display feedback
-            feedbackDisplay.textContent = result.message;
+            // Get relevant normal values to display
+            const normalRanges = getRelevantNormalRanges();
+            
+            // Display feedback with normal range info
+            feedbackDisplay.innerHTML = `${result.message}<br><br>
+                <span style="font-size: 0.85em; font-weight: normal;">
+                    ${normalRanges}
+                </span>`;
             feedbackDisplay.className = `feedback ${result.correct ? 'correct' : 'incorrect'}`;
+            
+            // Set up for auto-advance on Enter
+            waitingForNextQuestion = true;
             
             // Re-enable controls after a delay
             setTimeout(() => {
                 startButton.disabled = false;
             }, 500);
+        }
+        
+        function getRelevantNormalRanges() {
+            const patient = currentPatientData;
+            const ageGroup = patient.ageGroup;
+            const refData = PEDIATRIC_REFERENCE[ageGroup];
+            let rangeText = `Normal ranges for ${patient.ageDisplay}: `;
+            
+            // Add vital sign ranges based on what's in the current scenario
+            if (patient.heartRate !== undefined) {
+                rangeText += `HR: ${refData.heartRateRange[0]}-${refData.heartRateRange[1]} bpm`;
+            }
+            
+            if (patient.systolic !== undefined) {
+                let sysRange, diaRange;
+                
+                if (ageGroup === 'INFANT' || ageGroup === 'ADOLESCENT') {
+                    sysRange = `${refData.bpRange.systolic[0]}-${refData.bpRange.systolic[1]}`;
+                    diaRange = `${refData.bpRange.diastolic[0]}-${refData.bpRange.diastolic[1]}`;
+                } else {
+                    sysRange = `${refData.bpRange[patient.age].systolic[0]}-${refData.bpRange[patient.age].systolic[1]}`;
+                    diaRange = `${refData.bpRange[patient.age].diastolic[0]}-${refData.bpRange[patient.age].diastolic[1]}`;
+                }
+                
+                if (rangeText.length > 60) rangeText += ', ';
+                rangeText += `BP: ${sysRange}/${diaRange} mmHg`;
+            }
+            
+            if (patient.respiratoryRate !== undefined) {
+                if (rangeText.length > 60) rangeText += ', ';
+                rangeText += `RR: ${refData.respiratoryRateRange[0]}-${refData.respiratoryRateRange[1]}/min`;
+            }
+            
+            if (patient.temperature !== undefined) {
+                if (rangeText.length > 60) rangeText += ', ';
+                rangeText += `Temp: 36.5-37.5°C`;
+            }
+            
+            if (patient.urineOutput !== undefined) {
+                const minOutput = Math.round(patient.weight * 1 * 24); // 1 mL/kg/hr * 24hr
+                const maxOutput = Math.round(patient.weight * 3 * 24); // 3 mL/kg/hr * 24hr
+                
+                if (rangeText.length > 60) rangeText += ', ';
+                rangeText += `UO: ${minOutput}-${maxOutput} mL/24hr`;
+            }
+            
+            return rangeText;
         }
 
         function updateScore(points) {

@@ -1,4 +1,171 @@
-.score {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetalHamr</title>
+    <link rel="icon" href="favicon.png" type="image/x-icon">
+    <style>
+        :root {
+            --primary-color: #4a86e8;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+            --neutral-color: #ecf0f1;
+            --text-color: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            transition: background-color 0.5s;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .scenario-box {
+            background-color: var(--neutral-color);
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .timer-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .timer {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            width: 60px;
+            text-align: center;
+        }
+
+        .slider-container {
+            margin-bottom: 20px;
+        }
+
+        .slider-container label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .slider {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .vitals-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .vital-btn {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .vital-btn:hover {
+            filter: brightness(0.9);
+        }
+        
+        .vital-btn-high {
+            background-color: #ffdddd;
+            color: #d63031;
+        }
+        
+        .vital-btn-low {
+            background-color: #ddedff;
+            color: #0984e3;
+        }
+        
+        .vital-btn-normal {
+            background-color: #d4ffda;
+            color: #00b894;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #3a76d8;
+        }
+
+        button:disabled {
+            background-color: #b2c1e0;
+            cursor: not-allowed;
+        }
+
+        .score {
             font-size: 1.5rem;
             font-weight: bold;
             margin-top: 20px;
@@ -9,29 +176,1318 @@
             font-weight: bold;
             min-height: 25px;
         }
-        
-        .vitals-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 15px;
+
+        .feedback.correct {
+            color: var(--success-color);
         }
-        
-        .vital-btn {
+
+        .feedback.incorrect {
+            color: var(--error-color);
+        }
+
+        .flash {
+            animation: flashRed 0.5s;
+        }
+
+        @keyframes flashRed {
+            0% { background-color: rgba(231, 76, 60, 0.7); }
+            100% { background-color: white; }
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .stats {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
             background-color: var(--neutral-color);
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 8px 12px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .reference-toggle {
+            margin-top: 20px;
             font-size: 0.9rem;
+            color: var(--primary-color);
             cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            text-decoration: underline;
+        }
+
+        .reference-table {
+            display: none;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .reference-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .reference-table th, .reference-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .reference-table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .reference-table tr:nth-child(even) {
+            background-color: #f2f2f2;
         }
         
-        .vital-btn:hover {
-            background-color: #ddeeff;
-            border-color: var(--primary-color);
+        /* For smaller screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .scenario-box {
+                font-size: 1rem;
+                padding: 15px;
+            }
+            
+            .timer {
+                font-size: 1.5rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid var(--primary-color);
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="game-container">
+        <h1>Peds Vitals Hammering</h1>
+        
+        <div class="section">
+            <div class="slider-container">
+                <label for="timer-slider">Time Per Question: <span id="timer-value">5</span> seconds</label>
+                <input type="range" id="timer-slider" class="slider" min="1" max="20" value="5">
+            </div>
+            
+            <div class="timer-container">
+                <div class="timer" id="timer">5</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="scenario-box" id="scenario">
+                Click "Start Game" to begin...
+            </div>
+            
+            <div class="vitals-buttons" id="vitals-buttons">
+                <button type="button" class="vital-btn vital-btn-high" data-term="hypertension">BP 🔼</button>
+                <button type="button" class="vital-btn vital-btn-low" data-term="hypotension">BP 🔽</button>
+                <button type="button" class="vital-btn vital-btn-high" data-term="tachycardia">HR 🔼</button>
+                <button type="button" class="vital-btn vital-btn-low" data-term="bradycardia">HR 🔽</button>
+                <button type="button" class="vital-btn vital-btn-high" data-term="fever">🌡️🔼</button>
+                <button type="button" class="vital-btn vital-btn-low" data-term="hypothermia">🌡️🔽</button>
+                <button type="button" class="vital-btn vital-btn-high" data-term="tachypnea">RR 🔼</button>
+                <button type="button" class="vital-btn vital-btn-low" data-term="bradypnea">RR 🔽</button>
+                <button type="button" class="vital-btn vital-btn-low" data-term="oliguria">UOP 🔽</button>
+                <button type="button" class="vital-btn vital-btn-high" data-term="polyuria">UOP 🔼</button>
+                <button type="button" class="vital-btn vital-btn-normal" data-term="normal">Normal</button>
+            </div>
+            
+            <input type="text" id="answer-input" placeholder="Type your answer here (e.g., 'fever, tachycardia')..." disabled>
+            
+            <div class="feedback" id="feedback"></div>
+        </div>
+        
+        <div class="controls">
+            <button id="start-btn">Start Game</button>
+            <button id="submit-btn" disabled>Submit</button>
+        </div>
+        
+        <div class="score" id="score">Score: 0 | Avg Time: <span id="avg-time">0.0</span>s</div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div>Correct</div>
+                <div id="correct-count">0</div>
+            </div>
+            <div class="stat-item">
+                <div>Incorrect</div>
+                <div id="incorrect-count">0</div>
+            </div>
+            <div class="stat-item">
+                <div>Timeouts</div>
+                <div id="timeout-count">0</div>
+            </div>
+        </div>
+        
+        <div class="reference-toggle" id="reference-toggle">Show Reference Values</div>
+        <div class="reference-table" id="reference-table">
+            <table>
+                <tr>
+                    <th>Age Group</th>
+                    <th>Age</th>
+                    <th>Weight (kg)</th>
+                    <th>Heart Rate (bpm)</th>
+                    <th>Respiratory Rate</th>
+                    <th>BP (Systolic/Diastolic)</th>
+                </tr>
+                <tr>
+                    <td rowspan="1">Infant</td>
+                    <td>1-12 months</td>
+                    <td>4-10</td>
+                    <td>100-170</td>
+                    <td>30-60</td>
+                    <td>72-104/37-56</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">Toddler</td>
+                    <td>1 year</td>
+                    <td>10-14</td>
+                    <td>80-150</td>
+                    <td>24-40</td>
+                    <td>85-102/41-58</td>
+                </tr>
+                <tr>
+                    <td>2 years</td>
+                    <td>10-14</td>
+                    <td>80-150</td>
+                    <td>24-40</td>
+                    <td>89-106/44-62</td>
+                </tr>
+                <tr>
+                    <td rowspan="3">Preschooler</td>
+                    <td>3 years</td>
+                    <td>14-18</td>
+                    <td>70-130</td>
+                    <td>20-34</td>
+                    <td>90-107/47-65</td>
+                </tr>
+                <tr>
+                    <td>4 years</td>
+                    <td>14-18</td>
+                    <td>70-130</td>
+                    <td>20-34</td>
+                    <td>92-108/50-67</td>
+                </tr>
+                <tr>
+                    <td>5 years</td>
+                    <td>14-18</td>
+                    <td>70-130</td>
+                    <td>20-34</td>
+                    <td>93-110/53-70</td>
+                </tr>
+                <tr>
+                    <td rowspan="7">School-age</td>
+                    <td>6 years</td>
+                    <td>20-42</td>
+                    <td>65-120</td>
+                    <td>15-30</td>
+                    <td>90-109/59-73</td>
+                </tr>
+                <tr>
+                    <td>7 years</td>
+                    <td>20-42</td>
+                    <td>65-120</td>
+                    <td>15-30</td>
+                    <td>91-111/60-74</td>
+                </tr>
+                <tr>
+                    <td>8 years</td>
+                    <td>20-42</td>
+                    <td>65-120</td>
+                    <td>15-30</td>
+                    <td>93-113/60-75</td>
+                </tr>
+                <tr>
+                    <td>9 years</td>
+                    <td>20-42</td>
+                    <td>65-120</td>
+                    <td>15-30</td>
+                    <td>94-115/61-76</td>
+                </tr>
+                <tr>
+                    <td>10 years</td>
+                    <td>20-42</td>
+                    <td>65-120</td>
+                    <td>15-30</td>
+                    <td>96-117/62-77</td>
+                </tr>
+                <tr>
+                    <td>11 years</td>
+                    <td>20-42</td>
+                    <td>65-120</td>
+                    <td>15-30</td>
+                    <td>98-119/62-78</td>
+                </tr>
+                <tr>
+                    <td>12 years</td>
+                    <td>20-42</td>
+                    <td>65-120</td>
+                    <td>15-30</td>
+                    <td>100-121/63-78</td>
+                </tr>
+                <tr>
+                    <td>Adolescent</td>
+                    <td>>13 years</td>
+                    <td>50+</td>
+                    <td>55-90</td>
+                    <td>12-20</td>
+                    <td>102-124/64-80</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const gameContainer = document.getElementById('game-container');
+        const timerSlider = document.getElementById('timer-slider');
+        const timerValueDisplay = document.getElementById('timer-value');
+        const timerDisplay = document.getElementById('timer');
+        const scenarioDisplay = document.getElementById('scenario');
+        const answerInput = document.getElementById('answer-input');
+        const feedbackDisplay = document.getElementById('feedback');
+        const startButton = document.getElementById('start-btn');
+        const submitButton = document.getElementById('submit-btn');
+        const scoreDisplay = document.getElementById('score');
+        const correctCountDisplay = document.getElementById('correct-count');
+        const incorrectCountDisplay = document.getElementById('incorrect-count');
+        const timeoutCountDisplay = document.getElementById('timeout-count');
+        const referenceToggle = document.getElementById('reference-toggle');
+        const referenceTable = document.getElementById('reference-table');
+        const vitalButtons = document.querySelectorAll('.vital-btn');
+
+        // Toggle reference table
+        referenceToggle.addEventListener('click', () => {
+            if (referenceTable.style.display === 'block') {
+                referenceTable.style.display = 'none';
+                referenceToggle.textContent = 'Show Reference Values';
+            } else {
+                referenceTable.style.display = 'block';
+                referenceToggle.textContent = 'Hide Reference Values';
+            }
+        });
+
+        // Game State
+        let gameActive = false;
+        let timeRemaining = 5;
+        let timerInterval;
+        let currentScenario = '';
+        let currentAbnormalities = [];
+        let currentPatientData = {};
+        let score = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let timeoutCount = 0;
+        let startTime = 0;
+        let totalAnswerTime = 0;
+        let questionCount = 0;
+        let waitingForNextQuestion = false;
+
+        // Reference data for pediatric vital signs
+        const PEDIATRIC_REFERENCE = {
+            INFANT: {
+                ageRange: "1-12 months",
+                ageDisplay: function() { return `${getRandomNumber(1, 12)} months`; },
+                weightRange: [4, 10],
+                heartRateRange: [100, 170],
+                respiratoryRateRange: [30, 60],
+                bpRange: {
+                    systolic: [72, 104],
+                    diastolic: [37, 56]
+                }
+            },
+            TODDLER: {
+                ageRange: "1-2 years",
+                ageOptions: [1, 2],
+                weightRange: [10, 14],
+                heartRateRange: [80, 150],
+                respiratoryRateRange: [24, 40],
+                bpRange: {
+                    1: { systolic: [85, 102], diastolic: [41, 58] },
+                    2: { systolic: [89, 106], diastolic: [44, 62] }
+                }
+            },
+            PRESCHOOLER: {
+                ageRange: "3-5 years",
+                ageOptions: [3, 4, 5],
+                weightRange: [14, 18],
+                heartRateRange: [70, 130],
+                respiratoryRateRange: [20, 34],
+                bpRange: {
+                    3: { systolic: [90, 107], diastolic: [47, 65] },
+                    4: { systolic: [92, 108], diastolic: [50, 67] },
+                    5: { systolic: [93, 110], diastolic: [53, 70] }
+                }
+            },
+            SCHOOL_AGE: {
+                ageRange: "6-12 years",
+                ageOptions: [6, 7, 8, 9, 10, 11, 12],
+                weightRange: [20, 42],
+                heartRateRange: [65, 120],
+                respiratoryRateRange: [15, 30],
+                bpRange: {
+                    6: { systolic: [90, 109], diastolic: [59, 73] },
+                    7: { systolic: [91, 111], diastolic: [60, 74] },
+                    8: { systolic: [93, 113], diastolic: [60, 75] },
+                    9: { systolic: [94, 115], diastolic: [61, 76] },
+                    10: { systolic: [96, 117], diastolic: [62, 77] },
+                    11: { systolic: [98, 119], diastolic: [62, 78] },
+                    12: { systolic: [100, 121], diastolic: [63, 78] }
+                }
+            },
+            ADOLESCENT: {
+                ageRange: ">13 years",
+                ageDisplay: function() { return `${getRandomNumber(13, 17)} years`; },
+                weightRange: [50, 80],
+                heartRateRange: [55, 90],
+                respiratoryRateRange: [12, 20],
+                bpRange: {
+                    systolic: [102, 124],
+                    diastolic: [64, 80]
+                }
+            }
+        };
+
+        // Clinical condition definitions
+        const CLINICAL_CONDITIONS = {
+            "tachycardia": {
+                check: (data) => {
+                    const ageGroup = data.ageGroup;
+                    return data.heartRate > PEDIATRIC_REFERENCE[ageGroup].heartRateRange[1];
+                },
+                terms: ["tachycardia", "tachy", "increased hr", "high hr", "elevated hr"]
+            },
+            "bradycardia": {
+                check: (data) => {
+                    const ageGroup = data.ageGroup;
+                    return data.heartRate < PEDIATRIC_REFERENCE[ageGroup].heartRateRange[0];
+                },
+                terms: ["bradycardia", "brady", "decreased hr", "low hr"]
+            },
+            "tachypnea": {
+                check: (data) => {
+                    const ageGroup = data.ageGroup;
+                    return data.respiratoryRate > PEDIATRIC_REFERENCE[ageGroup].respiratoryRateRange[1];
+                },
+                terms: ["tachypnea", "increased rr", "high rr", "elevated rr"]
+            },
+            "bradypnea": {
+                check: (data) => {
+                    const ageGroup = data.ageGroup;
+                    return data.respiratoryRate < PEDIATRIC_REFERENCE[ageGroup].respiratoryRateRange[0];
+                },
+                terms: ["bradypnea", "decreased rr", "low rr"]
+            },
+            "hypertension": {
+                check: (data) => {
+                    const ageGroup = data.ageGroup;
+                    let maxSystolic, maxDiastolic;
+                    
+                    if (ageGroup === 'INFANT' || ageGroup === 'ADOLESCENT') {
+                        maxSystolic = PEDIATRIC_REFERENCE[ageGroup].bpRange.systolic[1];
+                        maxDiastolic = PEDIATRIC_REFERENCE[ageGroup].bpRange.diastolic[1];
+                    } else {
+                        maxSystolic = PEDIATRIC_REFERENCE[ageGroup].bpRange[data.age].systolic[1];
+                        maxDiastolic = PEDIATRIC_REFERENCE[ageGroup].bpRange[data.age].diastolic[1];
+                    }
+                    
+                    return data.systolic > maxSystolic || data.diastolic > maxDiastolic;
+                },
+                terms: ["hypertension", "htn", "high bp", "elevated bp"]
+            },
+            "hypotension": {
+                check: (data) => {
+                    const ageGroup = data.ageGroup;
+                    let minSystolic, minDiastolic;
+                    
+                    if (ageGroup === 'INFANT' || ageGroup === 'ADOLESCENT') {
+                        minSystolic = PEDIATRIC_REFERENCE[ageGroup].bpRange.systolic[0];
+                        minDiastolic = PEDIATRIC_REFERENCE[ageGroup].bpRange.diastolic[0];
+                    } else {
+                        minSystolic = PEDIATRIC_REFERENCE[ageGroup].bpRange[data.age].systolic[0];
+                        minDiastolic = PEDIATRIC_REFERENCE[ageGroup].bpRange[data.age].diastolic[0];
+                    }
+                    
+                    return data.systolic < minSystolic || data.diastolic < minDiastolic;
+                },
+                terms: ["hypotension", "low bp", "decreased bp"]
+            },
+            "fever": {
+                check: (data) => {
+                    return data.temperature > 38.0;
+                },
+                terms: ["fever", "febrile", "hyperthermia", "pyrexia", "high temp", "elevated temp"]
+            },
+            "hypothermia": {
+                check: (data) => {
+                    return data.temperature < 36.0;
+                },
+                terms: ["hypothermia", "low temp", "decreased temp"]
+            },
+            "oliguria": {
+                check: (data) => {
+                    // Pediatric oliguria is typically defined as <0.5-1 mL/kg/hr
+                    const expectedMinOutput = data.weight * 0.5 * 24; // mL per 24 hours
+                    return data.urineOutput < expectedMinOutput;
+                },
+                terms: ["oliguria", "decreased uo", "low uo", "low urine output"]
+            },
+            "polyuria": {
+                check: (data) => {
+                    // Excessive urine output
+                    const expectedMaxOutput = data.weight * 4 * 24; // mL per 24 hours (approximation)
+                    return data.urineOutput > expectedMaxOutput;
+                },
+                terms: ["polyuria", "increased uo", "high uo", "high urine output"]
+            },
+            "dehydration": {
+                check: (data) => {
+                    // Signs of dehydration can include tachycardia, decreased urine output
+                    const hasTachycardia = CLINICAL_CONDITIONS["tachycardia"].check(data);
+                    const hasOliguria = data.urineOutput ? CLINICAL_CONDITIONS["oliguria"].check(data) : false;
+                    
+                    return hasTachycardia && hasOliguria;
+                },
+                terms: ["dehydration", "dehydrated", "volume depleted", "hypovolemia"]
+            },
+            "shock": {
+                check: (data) => {
+                    // Signs of shock can include hypotension + tachycardia
+                    const hasHypotension = CLINICAL_CONDITIONS["hypotension"].check(data);
+                    const hasTachycardia = CLINICAL_CONDITIONS["tachycardia"].check(data);
+                    
+                    return hasHypotension && hasTachycardia;
+                },
+                terms: ["shock", "circulatory failure"]
+            },
+            "sepsis": {
+                check: (data) => {
+                    // Simplified definition: fever + tachycardia + tachypnea
+                    const hasFever = data.temperature ? data.temperature > 38.0 : false;
+                    const hasTachycardia = CLINICAL_CONDITIONS["tachycardia"].check(data);
+                    const hasTachypnea = data.respiratoryRate ? CLINICAL_CONDITIONS["tachypnea"].check(data) : false;
+                    
+                    return hasFever && (hasTachycardia || hasTachypnea);
+                },
+                terms: ["sepsis", "septic", "infection", "sirs"]
+            }
+        };
+
+        // Event Listeners
+        timerSlider.addEventListener('input', updateTimerValue);
+        startButton.addEventListener('click', startGame);
+        submitButton.addEventListener('click', submitAnswer);
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                submitAnswer();
+            }
+        });
+        
+        // Add event listeners for vital sign buttons
+        document.getElementById('vitals-buttons').addEventListener('click', (e) => {
+            if (e.target.classList.contains('vital-btn') && !e.target.disabled) {
+                const term = e.target.dataset.term;
+                
+                // If the input already has content, add a comma separator
+                if (answerInput.value.trim() !== '') {
+                    if (!answerInput.value.endsWith(', ')) {
+                        answerInput.value += ', ';
+                    }
+                }
+                
+                // Add the term
+                answerInput.value += term;
+                
+                // Focus back on the input
+                answerInput.focus();
+            }
+        });
+        
+        // Global keypress listener for advancing to next question
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && waitingForNextQuestion) {
+                e.preventDefault();
+                startGame();
+                waitingForNextQuestion = false;
+            }
+        });
+
+        // Initialize timer value display and score display
+        updateTimerValue();
+        updateScoreDisplay();
+
+        // Functions
+        function updateTimerValue() {
+            const value = timerSlider.value;
+            timerValueDisplay.textContent = value;
+            timerDisplay.textContent = value;
+            timeRemaining = value;
+        }
+
+        function startGame() {
+            // Reset game state
+            if (startButton.textContent === 'Start Game') {
+                score = 0;
+                correctCount = 0;
+                incorrectCount = 0;
+                timeoutCount = 0;
+                updateScoreDisplay();
+                startButton.textContent = 'Next Scenario';
+            }
+            
+            // Update UI
+            answerInput.disabled = false;
+            submitButton.disabled = false;
+            answerInput.value = '';
+            feedbackDisplay.textContent = '';
+            feedbackDisplay.className = 'feedback';
+            
+            // Enable vital buttons
+            vitalButtons.forEach(btn => btn.disabled = false);
+            
+            // Generate new scenario
+            generateNewScenario();
+        }
+
+        function generateNewScenario() {
+            // Clear previous data
+            answerInput.value = '';
+            feedbackDisplay.textContent = '';
+            feedbackDisplay.className = 'feedback';
+            answerInput.focus();
+            
+            // Generate patient data
+            currentPatientData = generatePatientData();
+            
+            // Format scenario text
+            currentScenario = formatScenario(currentPatientData);
+            scenarioDisplay.textContent = currentScenario;
+            
+            // Determine abnormalities in this scenario
+            currentAbnormalities = determineAbnormalities(currentPatientData);
+            
+            // Start timer
+            startTimer();
+        }
+
+        function generatePatientData() {
+            // Choose random age group
+            const ageGroups = Object.keys(PEDIATRIC_REFERENCE);
+            const ageGroup = ageGroups[Math.floor(Math.random() * ageGroups.length)];
+            const refData = PEDIATRIC_REFERENCE[ageGroup];
+            
+            // Determine age based on age group
+            let age;
+            let ageDisplay;
+            
+            if (ageGroup === 'INFANT' || ageGroup === 'ADOLESCENT') {
+                ageDisplay = refData.ageDisplay();
+                age = ageDisplay.split(' ')[0]; // Extract numeric part
+            } else {
+                age = refData.ageOptions[Math.floor(Math.random() * refData.ageOptions.length)];
+                ageDisplay = `${age} years`;
+            }
+            
+            // Gender
+            const gender = Math.random() > 0.5 ? 'male' : 'female';
+            
+            // Generate weight
+            const weightMin = refData.weightRange[0];
+            const weightMax = refData.weightRange[1];
+            const weight = getRandomNumber(weightMin, weightMax, 1);
+            
+            // Patient data object
+            const patientData = {
+                ageGroup: ageGroup,
+                age: age,
+                ageDisplay: ageDisplay,
+                gender: gender,
+                weight: weight
+            };
+            
+            // Randomly determine which vital signs to include (always include at least 2)
+            const vitalSigns = ['heartRate', 'bloodPressure', 'temperature', 'respiratoryRate', 'urineOutput'];
+            const shuffledVitalSigns = vitalSigns.sort(() => 0.5 - Math.random());
+            const numberOfVitalSigns = getRandomNumber(2, 4);
+            
+            // Ensure we have plenty of abnormal cases (60% chance)
+            const includeAbnormal = Math.random() < 0.6;
+  
+            // Generate vital signs
+            for (let i = 0; i < numberOfVitalSigns; i++) {
+                const vitalSign = shuffledVitalSigns[i];
+                
+                switch (vitalSign) {
+                    case 'heartRate':
+                        const hrMin = refData.heartRateRange[0];
+                        const hrMax = refData.heartRateRange[1];
+                        
+                        // Sometimes generate abnormal values
+                        if (includeAbnormal && Math.random() < 0.5) {
+                            // Either too high or too low
+                            if (Math.random() < 0.7) {
+                                // Tachycardia (more common)
+                                patientData.heartRate = getRandomNumber(hrMax + 5, hrMax + 40);
+                            } else {
+                                // Bradycardia
+                                patientData.heartRate = getRandomNumber(hrMin - 20, hrMin - 5);
+                            }
+                        } else {
+                            // Normal
+                            patientData.heartRate = getRandomNumber(hrMin, hrMax);
+                        }
+                        break;
+                        
+                    case 'bloodPressure':
+                        let sysMin, sysMax, diaMin, diaMax;
+                        
+                        if (ageGroup === 'INFANT' || ageGroup === 'ADOLESCENT') {
+                            sysMin = refData.bpRange.systolic[0];
+                            sysMax = refData.bpRange.systolic[1];
+                            diaMin = refData.bpRange.diastolic[0];
+                            diaMax = refData.bpRange.diastolic[1];
+                        } else {
+                            sysMin = refData.bpRange[age].systolic[0];
+                            sysMax = refData.bpRange[age].systolic[1];
+                            diaMin = refData.bpRange[age].diastolic[0];
+                            diaMax = refData.bpRange[age].diastolic[1];
+                        }
+                        
+                        // Sometimes generate abnormal values
+                        if (includeAbnormal && Math.random() < 0.5) {
+                            // Either too high or too low
+                            if (Math.random() < 0.5) {
+                                // Hypertension
+                                patientData.systolic = getRandomNumber(sysMax + 5, sysMax + 30);
+                                patientData.diastolic = getRandomNumber(diaMax + 5, diaMax + 20);
+                            } else {
+                                // Hypotension
+                                patientData.systolic = getRandomNumber(sysMin - 20, sysMin - 5);
+                                patientData.diastolic = getRandomNumber(diaMin - 15, diaMin - 3);
+                            }
+                        } else {
+                            // Normal
+                            patientData.systolic = getRandomNumber(sysMin, sysMax);
+                            patientData.diastolic = getRandomNumber(diaMin, diaMax);
+                        }
+                        break;
+                        
+                    case 'temperature':
+                        // Normal is about 36.5-37.5
+                        if (includeAbnormal && Math.random() < 0.6) {
+                            // Fever more common than hypothermia
+                            if (Math.random() < 0.8) {
+                                // Fever
+                                patientData.temperature = getRandomNumber(38.1, 40.5, 1);
+                            } else {
+                                // Hypothermia
+                                patientData.temperature = getRandomNumber(34.5, 35.9, 1);
+                            }
+                        } else {
+                            // Normal
+                            patientData.temperature = getRandomNumber(36.5, 37.5, 1);
+                        }
+                        break;
+                        
+                    case 'respiratoryRate':
+                        const rrMin = refData.respiratoryRateRange[0];
+                        const rrMax = refData.respiratoryRateRange[1];
+                        
+                        // Sometimes generate abnormal values
+                        if (includeAbnormal && Math.random() < 0.5) {
+                            // Either too high or too low
+                            if (Math.random() < 0.8) {
+                                // Tachypnea (more common)
+                                patientData.respiratoryRate = getRandomNumber(rrMax + 5, rrMax + 30);
+                            } else {
+                                // Bradypnea
+                                patientData.respiratoryRate = getRandomNumber(rrMin - 10, rrMin - 2);
+                            }
+                        } else {
+                            // Normal
+                            patientData.respiratoryRate = getRandomNumber(rrMin, rrMax);
+                        }
+                        break;
+                        
+                    case 'urineOutput':
+                        // Normal is about 1-3 mL/kg/hr
+                        const expectedOutput = weight * getRandomNumber(1, 3, 1) * 24; // mL per 24 hours
+                        
+                        if (includeAbnormal && Math.random() < 0.5) {
+                            if (Math.random() < 0.7) {
+                                // Oliguria (more common)
+                                patientData.urineOutput = Math.round(expectedOutput * getRandomNumber(0.1, 0.4, 1));
+                            } else {
+                                // Polyuria
+                                patientData.urineOutput = Math.round(expectedOutput * getRandomNumber(5, 8, 1));
+                            }
+                        } else {
+                            // Normal
+                            patientData.urineOutput = Math.round(expectedOutput);
+                        }
+                        break;
+                }
+            }
+            
+            return patientData;
+        }
+
+        function formatScenario(data) {
+            let scenario = `${data.ageDisplay}, ${data.gender}, ${data.weight} kg`;
+            
+            if (data.heartRate !== undefined) {
+                scenario += `, HR: ${data.heartRate} bpm`;
+            }
+            
+            if (data.systolic !== undefined && data.diastolic !== undefined) {
+                scenario += `, BP: ${data.systolic}/${data.diastolic} mmHg`;
+            }
+            
+            if (data.temperature !== undefined) {
+                scenario += `, Temp: ${data.temperature}°C`;
+            }
+            
+            if (data.respiratoryRate !== undefined) {
+                scenario += `, RR: ${data.respiratoryRate}/min`;
+            }
+            
+            if (data.urineOutput !== undefined) {
+                scenario += `, UO: ${data.urineOutput} mL/24hr`;
+            }
+            
+            return scenario;
+        }
+
+        function determineAbnormalities(data) {
+            const abnormalities = [];
+            
+            for (const condition in CLINICAL_CONDITIONS) {
+                const conditionCheck = CLINICAL_CONDITIONS[condition].check;
+                try {
+                    if (conditionCheck(data)) {
+                        abnormalities.push(condition);
+                    }
+                } catch (e) {
+                    // Skip conditions that require vital signs not present in this scenario
+                    console.log(`Skipping condition check for ${condition}: ${e.message}`);
+                }
+            }
+            
+            return abnormalities;
+        }
+
+        function getRandomNumber(min, max, decimals = 0) {
+            const factor = Math.pow(10, decimals);
+            return Number(((Math.random() * (max - min) + min) * factor / factor).toFixed(decimals));
+        }
+
+        function startTimer() {
+            // Reset timer
+            timeRemaining = parseInt(timerSlider.value);
+            timerDisplay.textContent = timeRemaining;
+            
+            // Clear any existing interval
+            clearInterval(timerInterval);
+            
+            // Record start time for tracking response time
+            startTime = Date.now();
+            
+            // Start new interval
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                timerDisplay.textContent = timeRemaining;
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function handleTimeout() {
+            // Apply penalty
+            updateScore(-1);
+            timeoutCount++;
+            timeoutCountDisplay.textContent = timeoutCount;
+            
+            // Update time statistics (using max time since it timed out)
+            totalAnswerTime += parseInt(timerSlider.value);
+            questionCount++;
+            updateAverageTime();
+            
+            // Visual feedback
+            flashScreen();
+            
+            let correctAnswers = '';
+            if (currentAbnormalities.length > 0) {
+                correctAnswers = currentAbnormalities.join(', ');
+            } else {
+                correctAnswers = 'normal vitals';
+            }
+            
+            // Get normal ranges
+            const normalRanges = getRelevantNormalRanges();
+            
+            // Display feedback with normal range info
+            feedbackDisplay.innerHTML = `Time expired! The abnormalities were: ${correctAnswers}<br><br>
+                <span style="font-size: 0.85em; font-weight: normal;">
+                    ${normalRanges}
+                </span>`;
+            feedbackDisplay.className = 'feedback incorrect';
+            
+            // Disable input until next round
+            answerInput.disabled = true;
+            submitButton.disabled = true;
+            
+            // Set up for auto-advance
+            waitingForNextQuestion = true;
+            
+            // Re-enable after a delay
+            setTimeout(() => {
+                startButton.disabled = false;
+            }, 1500);
+        }
+
+        function submitAnswer() {
+            // Stop the timer
+            clearInterval(timerInterval);
+            
+            // Calculate time taken for this question
+            const endTime = Date.now();
+            const timeTaken = (endTime - startTime) / 1000; // Convert to seconds
+            
+            // Update time tracking
+            totalAnswerTime += timeTaken;
+            questionCount++;
+            updateAverageTime();
+            
+            // Get user's answer
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            
+            if (userAnswer === '') {
+                // If no answer, treat as timeout
+                handleTimeout();
+                return;
+            }
+            
+            // Disable inputs while checking
+            answerInput.disabled = true;
+            submitButton.disabled = true;
+            startButton.disabled = true;
+            
+            // Send to AI for checking
+            checkAnswer(userAnswer);
+            // Note: handleAnswerResult will be called by the AI response callback
+        }
+        
+        function updateAverageTime() {
+            if (questionCount > 0) {
+                const avgTime = (totalAnswerTime / questionCount).toFixed(1);
+                const avgTimeElement = document.getElementById('avg-time');
+                if (avgTimeElement) {
+                    avgTimeElement.textContent = avgTime;
+                }
+            }
+        }
+
+        function checkAnswer(userAnswer) {
+            // Show loading state
+            feedbackDisplay.innerHTML = '<div style="text-align: center; padding: 10px;">Checking with AI...<div class="loader"></div></div>';
+            
+            // Get reference vitals for this patient's age
+            const refVitals = getReferenceVitals(currentPatientData);
+            
+            // Create an object with the current case details to send to the AI
+            const aiRequest = {
+                patient: currentPatientData,
+                reference: refVitals,
+                userResponse: userAnswer,
+                abnormalities: currentAbnormalities
+            };
+            
+            // Call the AI API to evaluate the response
+            callAiApi(aiRequest);
+        }
+        
+        function getReferenceVitals(patientData) {
+            const ageGroup = patientData.ageGroup;
+            const refData = PEDIATRIC_REFERENCE[ageGroup];
+            let refVitals = {};
+            
+            if (ageGroup === 'INFANT' || ageGroup === 'ADOLESCENT') {
+                refVitals = {
+                    heartRateRange: refData.heartRateRange,
+                    respiratoryRateRange: refData.respiratoryRateRange,
+                    bpRange: refData.bpRange
+                };
+            } else {
+                refVitals = {
+                    heartRateRange: refData.heartRateRange,
+                    respiratoryRateRange: refData.respiratoryRateRange,
+                    bpRange: refData.bpRange[patientData.age]
+                };
+            }
+            
+            return refVitals;
+        }
+        
+        function formatAiRequest(requestData) {
+            // Create a well-formatted prompt for the AI
+            const patient = requestData.patient;
+            const ref = requestData.reference;
+            
+            let prompt = `
+You are evaluating a pediatric clinical scenario. The vital signs are presented followed by a learner's assessment.
+Determine if the assessment is correct based on the vital signs and age-appropriate normal ranges provided.
+
+PATIENT DATA:
+- Age: ${patient.ageDisplay}
+- Weight: ${patient.weight} kg
+`;
+            
+            // Add vital signs that are present
+            if (patient.heartRate !== undefined) {
+                prompt += `- Heart Rate: ${patient.heartRate} bpm (Normal range: ${ref.heartRateRange[0]}-${ref.heartRateRange[1]} bpm)\n`;
+            }
+            
+            if (patient.systolic !== undefined && patient.diastolic !== undefined) {
+                const bpRef = ref.bpRange;
+                let sysRange, diaRange;
+                
+                if (Array.isArray(bpRef.systolic)) {
+                    sysRange = `${bpRef.systolic[0]}-${bpRef.systolic[1]}`;
+                    diaRange = `${bpRef.diastolic[0]}-${bpRef.diastolic[1]}`;
+                } else {
+                    sysRange = `${bpRef.systolic[0]}-${bpRef.systolic[1]}`;
+                    diaRange = `${bpRef.diastolic[0]}-${bpRef.diastolic[1]}`;
+                }
+                
+                prompt += `- Blood Pressure: ${patient.systolic}/${patient.diastolic} mmHg (Normal range: ${sysRange}/${diaRange} mmHg)\n`;
+            }
+            
+            if (patient.temperature !== undefined) {
+                prompt += `- Temperature: ${patient.temperature}°C (Normal range: 36.5-37.5°C)\n`;
+            }
+            
+            if (patient.respiratoryRate !== undefined) {
+                prompt += `- Respiratory Rate: ${patient.respiratoryRate}/min (Normal range: ${ref.respiratoryRateRange[0]}-${ref.respiratoryRateRange[1]}/min)\n`;
+            }
+            
+            if (patient.urineOutput !== undefined) {
+                const expectedOutput = patient.weight * 1 * 24; // Minimal normal (1 mL/kg/hr)
+                const maxOutput = patient.weight * 4 * 24; // Maximum normal (4 mL/kg/hr)
+                prompt += `- Urine Output: ${patient.urineOutput} mL/24hr (Normal range: ${Math.round(expectedOutput)}-${Math.round(maxOutput)} mL/24hr)\n`;
+            }
+            
+            // Add abnormalities detected by the system
+            if (requestData.abnormalities && requestData.abnormalities.length > 0) {
+                prompt += `\nABNORMALITIES DETECTED BY SYSTEM: ${requestData.abnormalities.join(', ')}\n`;
+            } else {
+                prompt += `\nABNORMALITIES DETECTED BY SYSTEM: None (all vital signs within normal ranges)\n`;
+            }
+            
+            prompt += `\nLEARNER'S ASSESSMENT: "${requestData.userResponse}"\n\n`;
+            
+            prompt += `Evaluate if the learner's assessment is correct. 
+
+IMPORTANT: Use one of these prefixes to start your response:
+- Use "INCORRECT:" if the assessment is wrong.
+- Use "CORRECT:" only if the assessment is right.
+- Use "PARTIALLY CORRECT:" if the assessment is partially right.
+
+If the learner identified all abnormalities or correctly noted normal vitals, they are correct.
+If the learner identified some but not all abnormalities, they are partially correct.
+If the learner identified none of the abnormalities or found problems where there are none, they are incorrect.
+
+Always include the specific vital sign values that are abnormal or explain why the vital signs are normal.`;
+            
+            return prompt;
+        }
+        
+        function callAiApi(requestData) {
+            // Format the data for the AI assessment
+            const formattedRequest = formatAiRequest(requestData);
+            
+            // Display loading state
+            feedbackDisplay.innerHTML = '<div style="text-align: center; padding: 10px;">Checking with AI...<div class="loader"></div></div>';
+            
+            // API configuration
+            const apiKey = "sk-7sulP0Nq2oGR8PoB9lXAsg";
+            const url = "https://api.ppq.ai/chat/completions";
+            
+            // Create payload with proper structure
+            const payload = {
+                model: "gpt-4o",
+                messages: [{ role: "user", content: formattedRequest }]
+            };
+            
+            // Make the actual API call
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${apiKey}`
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`API responded with status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Parse AI response - the content will be in choices[0].message.content
+                const aiResponse = data.choices[0].message.content;
+                
+                // Improved parsing of the AI's response
+                let isCorrect = false;
+                const upperResponse = aiResponse.toUpperCase();
+                
+                // First, check if response explicitly starts with CORRECT or PARTIALLY CORRECT
+                if (upperResponse.startsWith('CORRECT:') || upperResponse.startsWith('PARTIALLY CORRECT:')) {
+                    // Now check for contradictory content - if it says the assessment is incorrect
+                    if (
+                        aiResponse.toLowerCase().includes("assessment is incorrect") || 
+                        aiResponse.toLowerCase().includes("assessment of") && aiResponse.toLowerCase().includes("is incorrect") ||
+                        aiResponse.toLowerCase().includes("learner's") && aiResponse.toLowerCase().includes("is incorrect")
+                    ) {
+                        isCorrect = false; // Override to false if explanation contradicts the CORRECT prefix
+                    } else {
+                        isCorrect = true;
+                    }
+                } else if (upperResponse.startsWith('INCORRECT:')) {
+                    isCorrect = false;
+                }
+                
+                const result = {
+                    correct: isCorrect,
+                    message: aiResponse
+                };
+                
+                handleAnswerResult(result);
+            })
+            .catch(error => {
+                console.error("API error:", error);
+                // Show error message to user
+                feedbackDisplay.innerHTML = 'Error connecting to AI service. Falling back to simple validation.';
+                
+                // Fall back to simulation if API fails
+                simulateAiResponse(requestData);
+            });
+        }
+        
+        function simulateAiResponse(requestData) {
+            // This is a temporary function for demo purposes
+            // In production, this would be replaced with the actual API response
+            
+            const abnormalities = requestData.abnormalities;
+            const userResponse = requestData.userResponse.toLowerCase();
+            const patientData = requestData.patient;
+            
+            let isCorrect = false;
+            let explanation = "";
+            
+            // If there are no abnormalities, check if user indicated normal/stable
+            if (abnormalities.length === 0) {
+                if (userResponse.includes('normal') || 
+                    userResponse.includes('stable') || 
+                    userResponse.includes('wnl') ||  // within normal limits
+                    userResponse.includes('healthy')) {
+                    isCorrect = true;
+                    explanation = "CORRECT: All vital signs are within normal limits for this patient's age.";
+                } else {
+                    isCorrect = false;
+                    explanation = "INCORRECT: You identified abnormalities, but all vital signs are actually within normal limits for this patient's age.";
+                }
+            } else {
+                // Check for matches with known abnormalities
+                let matches = 0;
+                let matchedAbnormalities = [];
+                let missedAbnormalities = [];
+                
+                for (const abnormality of abnormalities) {
+                    const terms = CLINICAL_CONDITIONS[abnormality].terms;
+                    if (terms.some(term => userResponse.includes(term))) {
+                        matches++;
+                        matchedAbnormalities.push(abnormality);
+                    } else {
+                        missedAbnormalities.push(abnormality);
+                    }
+                }
+                
+                if (matches === abnormalities.length) {
+                    isCorrect = true;
+                    
+                    let abnormalValues = '';
+                    if (patientData.heartRate !== undefined && CLINICAL_CONDITIONS.tachycardia.check(patientData)) {
+                        abnormalValues += `HR ${patientData.heartRate} bpm (elevated), `;
+                    } else if (patientData.heartRate !== undefined && CLINICAL_CONDITIONS.bradycardia.check(patientData)) {
+                        abnormalValues += `HR ${patientData.heartRate} bpm (low), `;
+                    }
+                    
+                    if (patientData.temperature !== undefined && patientData.temperature > 38.0) {
+                        abnormalValues += `Temp ${patientData.temperature}°C (elevated), `;
+                    } else if (patientData.temperature !== undefined && patientData.temperature < 36.0) {
+                        abnormalValues += `Temp ${patientData.temperature}°C (low), `;
+                    }
+                    
+                    if (patientData.systolic !== undefined && CLINICAL_CONDITIONS.hypotension.check(patientData)) {
+                        abnormalValues += `BP ${patientData.systolic}/${patientData.diastolic} mmHg (low), `;
+                    } else if (patientData.systolic !== undefined && CLINICAL_CONDITIONS.hypertension.check(patientData)) {
+                        abnormalValues += `BP ${patientData.systolic}/${patientData.diastolic} mmHg (elevated), `;
+                    }
+                    
+                    if (abnormalValues.length > 0) {
+                        abnormalValues = abnormalValues.slice(0, -2); // Remove trailing comma
+                        explanation = `CORRECT: You identified all abnormalities: ${abnormalities.join(', ')}. Abnormal values: ${abnormalValues}.`;
+                    } else {
+                        explanation = `CORRECT: You identified all abnormalities: ${abnormalities.join(', ')}.`;
+                    }
+                } else if (matches > 0) {
+                    isCorrect = true;
+                    explanation = `PARTIALLY CORRECT: You identified ${matches}/${abnormalities.length} abnormalities (${matchedAbnormalities.join(', ')}). You missed: ${missedAbnormalities.join(', ')}.`;
+                } else {
+                    isCorrect = false;
+                    explanation = `INCORRECT: You did not identify any of the abnormalities. The abnormalities were: ${abnormalities.join(', ')}.`;
+                }
+            }
+            
+            const result = {
+                correct: isCorrect,
+                message: explanation
+            };
+            
+            handleAnswerResult(result);
+        }
+
+        function handleAnswerResult(result) {
+            // Update score
+            const points = result.correct ? 1 : -1;
+            updateScore(points);
+            
+            // Update counters
+            if (result.correct) {
+                correctCount++;
+                correctCountDisplay.textContent = correctCount;
+            } else {
+                incorrectCount++;
+                incorrectCountDisplay.textContent = incorrectCount;
+                flashScreen();
+            }
+            
+            // Get relevant normal values to display
+            const normalRanges = getRelevantNormalRanges();
+            
+            // Display feedback with normal range info
+            feedbackDisplay.innerHTML = `${result.message}<br><br>
+                <span style="font-size: 0.85em; font-weight: normal;">
+                    ${normalRanges}
+                </span>`;
+            feedbackDisplay.className = `feedback ${result.correct ? 'correct' : 'incorrect'}`;
+            
+            // Set up for auto-advance on Enter
+            waitingForNextQuestion = true;
+            
+            // Re-enable controls after a delay
+            setTimeout(() => {
+                startButton.disabled = false;
+            }, 500);
+        }
+        
+        function getRelevantNormalRanges() {
+            const patient = currentPatientData;
+            const ageGroup = patient.ageGroup;
+            const refData = PEDIATRIC_REFERENCE[ageGroup];
+            let rangeText = `Normal ranges for ${patient.ageDisplay}: `;
+            
+            // Add vital sign ranges based on what's in the current scenario
+            if (patient.heartRate !== undefined) {
+                rangeText += `HR: ${refData.heartRateRange[0]}-${refData.heartRateRange[1]} bpm`;
+            }
+            
+            if (patient.systolic !== undefined) {
+                let sysRange, diaRange;
+                
+                if (ageGroup === 'INFANT' || ageGroup === 'ADOLESCENT') {
+                    sysRange = `${refData.bpRange.systolic[0]}-${refData.bpRange.systolic[1]}`;
+                    diaRange = `${refData.bpRange.diastolic[0]}-${refData.bpRange.diastolic[1]}`;
+                } else {
+                    sysRange = `${refData.bpRange[patient.age].systolic[0]}-${refData.bpRange[patient.age].systolic[1]}`;
+                    diaRange = `${refData.bpRange[patient.age].diastolic[0]}-${refData.bpRange[patient.age].diastolic[1]}`;
+                }
+                
+                if (rangeText.length > 60) rangeText += ', ';
+                rangeText += `BP: ${sysRange}/${diaRange} mmHg`;
+            }
+            
+            if (patient.respiratoryRate !== undefined) {
+                if (rangeText.length > 60) rangeText += ', ';
+                rangeText += `RR: ${refData.respiratoryRateRange[0]}-${refData.respiratoryRateRange[1]}/min`;
+            }
+            
+            if (patient.temperature !== undefined) {
+                if (rangeText.length > 60) rangeText += ', ';
+                rangeText += `Temp: 36.5-37.5°C`;
+            }
+            
+            if (patient.urineOutput !== undefined) {
+                const minOutput = Math.round(patient.weight * 1 * 24); // 1 mL/kg/hr * 24hr
+                const maxOutput = Math.round(patient.weight * 3 * 24); // 3 mL/kg/hr * 24hr
+                
+                if (rangeText.length > 60) rangeText += ', ';
+                rangeText += `UO: ${minOutput}-${maxOutput} mL/24hr`;
+            }
+            
+            return rangeText;
+        }
+
+        function updateScore(points) {
+            score += points;
+            updateScoreDisplay();
+        }
+
+        function updateScoreDisplay() {
+                            scoreDisplay.innerHTML = `Score: ${score} | Avg Time: <span id="avg-time">0.0</span>s`;
+                document.getElementById('avg-time').textContent = '0.0';
+        }
+
+        function flashScreen() {
+            gameContainer.classList.add('flash');
+            setTimeout(() => gameContainer.classList.remove('flash'), 500);
+        }
+    </script>
+</body>
+    <footer>
+  <p>made by robbie.med | <a href="http://linktr.ee/robbiemed">get in contact</a> A.D. 2025, S.D.G.</p>
+</footer>
+</html>

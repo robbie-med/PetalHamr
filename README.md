@@ -4,6 +4,7 @@ An app to hammer pediatric vitals into your brain 🧠🔨
 _Last Updated: 13MAR2025_
 
 # About
+http://petalhamr.robbiemed.org
 ## Overview
 
 The Pediatric Vitals Drill App is a lightweight, interactive game designed to help reinforce pediatric clinical skills. The app presents a one-line clinical scenario—including weight and 1 to 4 vital signs (heart rate, blood pressure, temperature, respiratory rate, or 24‑hr urine output). Users quickly input a free-text answer (e.g., “fever, hypotens”) which is then evaluated by an AI using the GPT-4o model. Based on the evaluation, the user’s score is adjusted (+1 for correct, –1 for incorrect or timeout).
